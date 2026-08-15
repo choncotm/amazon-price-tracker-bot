@@ -57,8 +57,7 @@ def fetch_product(url: str) -> dict:
 
 
 def _parse_price(raw: str) -> float | None:
-    cleaned = re.sub(r"[^\d,.\s\xa0]", "", raw).strip()
-    cleaned = cleaned.replace("\xa0", "").replace(" ", "")
+    cleaned = re.sub(r"[^\d,.]", "", raw)
     if "," in cleaned and "." in cleaned:
         cleaned = cleaned.replace(".", "").replace(",", ".")
     elif "," in cleaned:
