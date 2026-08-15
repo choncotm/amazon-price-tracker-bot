@@ -31,7 +31,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     await update.message.reply_text(
         "Salut ! Je surveille des prix Amazon.\n\n"
-        "/track <url> [prix_cible] - suivre un produit\n"
+        "/track <url> - suivre un produit\n"
         "/list - voir mes produits suivis\n"
         "/untrack <id> - arrêter de suivre un produit\n"
         "/help - afficher cette aide"
@@ -44,17 +44,10 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 async def track(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not context.args:
-        await update.message.reply_text("Usage : /track <url_amazon> [prix_cible]")
+        await update.message.reply_text("Usage : /track <url_amazon>")
         return
 
     url = context.args[0]
-    target_price = None
-    if len(context.args) > 1:
-        try:
-            target_price = float(context.args[1].replace(",", "."))
-        except ValueError:
-            await update.message.reply_text("Le prix cible doit être un nombre.")
-            return
 
     await update.message.reply_text("Récupération du prix en cours...")
 
@@ -74,7 +67,6 @@ async def track(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             user_id=user.id,
             url=url,
             title=product["title"],
-            target_price=target_price,
             last_price=product["price"],
             currency="EUR",
         )
@@ -85,8 +77,6 @@ async def track(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         session.close()
 
     msg = f"Produit ajouté (#{item_id}) : {product['title']}\nPrix actuel : {product['price']:.2f}"
-    if target_price:
-        msg += f"\nJe t'alerte si le prix descend sous {target_price:.2f}"
     await update.message.reply_text(msg)
 
 
@@ -99,12 +89,7 @@ async def list_tracks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
             await update.message.reply_text("Tu ne suis aucun produit pour l'instant.")
             return
 
-        lines = []
-        for t in tracks:
-            line = f"#{t.id} - {t.title} - {t.last_price:.2f}"
-            if t.target_price:
-                line += f" (cible : {t.target_price:.2f})"
-            lines.append(line)
+        lines = [f"#{t.id} - {t.title} - {t.last_price:.2f}" for t in tracks]
         await update.message.reply_text("\n".join(lines))
     finally:
         session.close()

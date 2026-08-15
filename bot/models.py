@@ -24,7 +24,6 @@ class Track(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     url = Column(Text, nullable=False)
     title = Column(Text)
-    target_price = Column(Float)
     last_price = Column(Float)
     currency = Column(String(8), default="EUR")
     created_at = Column(DateTime, default=datetime.utcnow)

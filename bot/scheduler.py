@@ -35,8 +35,6 @@ async def check_prices(application: Application) -> None:
 
                 direction = "Baisse" if new_price < old_price else "Hausse"
                 text = f"{direction} de prix ! {t.title}\n{old_price:.2f} -> {new_price:.2f}\n{t.url}"
-                if t.target_price is not None and new_price <= t.target_price:
-                    text += f"\nPrix cible atteint ({t.target_price:.2f}) !"
 
                 user = session.query(User).filter_by(id=t.user_id).first()
                 await application.bot.send_message(chat_id=user.chat_id, text=text)
