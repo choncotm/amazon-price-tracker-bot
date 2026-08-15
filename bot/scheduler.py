@@ -30,21 +30,16 @@ async def check_prices(application: Application) -> None:
             session.add(PriceHistory(track_id=t.id, price=new_price))
 
             if new_price != old_price:
-                should_alert = new_price < old_price or (
-                    t.target_price is not None and new_price <= t.target_price
-                )
                 t.last_price = new_price
                 session.commit()
 
-                if should_alert:
-                    user = session.query(User).filter_by(id=t.user_id).first()
-                    await application.bot.send_message(
-                        chat_id=user.chat_id,
-                        text=(
-                            f"Baisse de prix ! {t.title}\n"
-                            f"{old_price:.2f} -> {new_price:.2f}\n{t.url}"
-                        ),
-                    )
+                direction = "Baisse" if new_price < old_price else "Hausse"
+                text = f"{direction} de prix ! {t.title}\n{old_price:.2f} -> {new_price:.2f}\n{t.url}"
+                if t.target_price is not None and new_price <= t.target_price:
+                    text += f"\nPrix cible atteint ({t.target_price:.2f}) !"
+
+                user = session.query(User).filter_by(id=t.user_id).first()
+                await application.bot.send_message(chat_id=user.chat_id, text=text)
             else:
                 session.commit()
     finally:
