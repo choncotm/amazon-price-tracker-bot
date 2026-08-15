@@ -1,15 +1,11 @@
 import re
 
-import requests
-from bs4 import BeautifulSoup
+from playwright.sync_api import sync_playwright
 
-HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-    ),
-    "Accept-Language": "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7",
-}
+USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+)
 
 PRICE_SELECTORS = [
     "#corePrice_feature_div span.a-offscreen",
@@ -19,7 +15,7 @@ PRICE_SELECTORS = [
     "span.a-price span.a-offscreen",
 ]
 
-TITLE_SELECTORS = ["#productTitle"]
+TITLE_SELECTOR = "#productTitle"
 
 
 class ScrapeError(Exception):
@@ -27,24 +23,32 @@ class ScrapeError(Exception):
 
 
 def fetch_product(url: str) -> dict:
-    response = requests.get(url, headers=HEADERS, timeout=15)
-    response.raise_for_status()
-    soup = BeautifulSoup(response.text, "html.parser")
+    with sync_playwright() as p:
+        browser = p.chromium.launch(
+            headless=True, args=["--disable-blink-features=AutomationControlled"]
+        )
+        try:
+            context = browser.new_context(
+                user_agent=USER_AGENT,
+                locale="fr-FR",
+                viewport={"width": 1280, "height": 800},
+            )
+            page = context.new_page()
+            page.goto(url, wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_timeout(1500)
 
-    title = None
-    for selector in TITLE_SELECTORS:
-        node = soup.select_one(selector)
-        if node:
-            title = node.get_text(strip=True)
-            break
+            title_el = page.query_selector(TITLE_SELECTOR)
+            title = title_el.inner_text().strip() if title_el else None
 
-    price = None
-    for selector in PRICE_SELECTORS:
-        node = soup.select_one(selector)
-        if node:
-            price = _parse_price(node.get_text(strip=True))
-            if price is not None:
-                break
+            price = None
+            for selector in PRICE_SELECTORS:
+                el = page.query_selector(selector)
+                if el:
+                    price = _parse_price(el.inner_text())
+                    if price is not None:
+                        break
+        finally:
+            browser.close()
 
     if price is None:
         raise ScrapeError("Could not find a price on the page")
