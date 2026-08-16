@@ -2,7 +2,7 @@ import logging
 import os
 
 from dotenv import load_dotenv
-from telegram import Update
+from telegram import BotCommand, Update
 from telegram.ext import (
     Application,
     CallbackQueryHandler,
@@ -28,6 +28,19 @@ logger = logging.getLogger(__name__)
 
 
 async def post_init(application: Application) -> None:
+    await application.bot.set_my_commands(
+        [
+            BotCommand("start", "Démarrer le bot"),
+            BotCommand("track", "Suivre un produit Amazon"),
+            BotCommand("list", "Voir mes produits suivis"),
+            BotCommand("untrack", "Arrêter de suivre un produit"),
+            BotCommand("history", "Historique des prix d'un produit"),
+            BotCommand("language", "Changer de langue"),
+            BotCommand("contact", "Me contacter"),
+            BotCommand("help", "Afficher l'aide"),
+        ]
+    )
+
     interval = int(os.environ.get("CHECK_INTERVAL_MINUTES", "60"))
     start_scheduler(application, interval)
     logger.info("Scheduler started, checking prices every %s minutes", interval)
