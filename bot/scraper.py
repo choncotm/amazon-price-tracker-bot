@@ -36,6 +36,7 @@ def fetch_product(url: str) -> dict:
             page = context.new_page()
             page.goto(url, wait_until="domcontentloaded", timeout=30000)
             page.wait_for_timeout(1500)
+            final_url = page.url
 
             title_el = page.query_selector(TITLE_SELECTOR)
             title = title_el.inner_text().strip() if title_el else None
@@ -53,7 +54,7 @@ def fetch_product(url: str) -> dict:
     if price is None:
         raise ScrapeError("Could not find a price on the page")
 
-    return {"title": title or url, "price": price}
+    return {"title": title or url, "price": price, "url": final_url}
 
 
 def _parse_price(raw: str) -> float | None:

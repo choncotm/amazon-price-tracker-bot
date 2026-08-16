@@ -4,6 +4,7 @@ import logging
 from telegram import Update
 from telegram.ext import ContextTypes
 
+from affiliate import with_affiliate_tag
 from db import SessionLocal
 from models import Track, User
 from scraper import ScrapeError, fetch_product
@@ -65,7 +66,7 @@ async def track(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         user = _get_or_create_user(session, update)
         item = Track(
             user_id=user.id,
-            url=url,
+            url=product["url"],
             title=product["title"],
             last_price=product["price"],
             currency="EUR",
@@ -76,7 +77,11 @@ async def track(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     finally:
         session.close()
 
-    msg = f"Produit ajouté (#{item_id}) : {product['title']}\nPrix actuel : {product['price']:.2f}"
+    link = with_affiliate_tag(product["url"])
+    msg = (
+        f"Produit ajouté (#{item_id}) : {product['title']}\n"
+        f"Prix actuel : {product['price']:.2f}\n{link}"
+    )
     await update.message.reply_text(msg)
 
 

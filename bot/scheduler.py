@@ -4,6 +4,7 @@ import logging
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from telegram.ext import Application
 
+from affiliate import with_affiliate_tag
 from db import SessionLocal
 from models import PriceHistory, Track, User
 from scraper import ScrapeError, fetch_product
@@ -34,7 +35,8 @@ async def check_prices(application: Application) -> None:
                 session.commit()
 
                 direction = "Baisse" if new_price < old_price else "Hausse"
-                text = f"{direction} de prix ! {t.title}\n{old_price:.2f} -> {new_price:.2f}\n{t.url}"
+                link = with_affiliate_tag(t.url)
+                text = f"{direction} de prix ! {t.title}\n{old_price:.2f} -> {new_price:.2f}\n{link}"
 
                 user = session.query(User).filter_by(id=t.user_id).first()
                 await application.bot.send_message(chat_id=user.chat_id, text=text)
