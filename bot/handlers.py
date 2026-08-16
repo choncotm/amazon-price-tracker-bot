@@ -45,6 +45,15 @@ def _product_keyboard(track_id: int, link: str, include_help: bool = True) -> In
     return _with_help_button(rows) if include_help else InlineKeyboardMarkup(rows)
 
 
+async def _send_product(
+    update: Update, text: str, keyboard: InlineKeyboardMarkup, image_url: str | None
+) -> None:
+    if image_url:
+        await update.effective_message.reply_photo(image_url, caption=text, reply_markup=keyboard)
+    else:
+        await update.effective_message.reply_text(text, reply_markup=keyboard)
+
+
 def _get_or_create_user(session, update: Update) -> User:
     telegram_id = update.effective_user.id
     chat_id = update.effective_chat.id
@@ -92,6 +101,7 @@ async def _track_url(update: Update, context: ContextTypes.DEFAULT_TYPE, url: st
             user_id=user.id,
             url=product["url"],
             title=product["title"],
+            image_url=product.get("image"),
             last_price=product["price"],
             currency="EUR",
         )
@@ -103,7 +113,7 @@ async def _track_url(update: Update, context: ContextTypes.DEFAULT_TYPE, url: st
 
     link = with_affiliate_tag(product["url"])
     msg = f"Produit ajouté (#{item_id}) : {product['title']}\nPrix actuel : {product['price']:.2f}"
-    await update.effective_message.reply_text(msg, reply_markup=_product_keyboard(item_id, link))
+    await _send_product(update, msg, _product_keyboard(item_id, link), product.get("image"))
 
 
 async def track(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -140,9 +150,8 @@ async def list_tracks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         for t in tracks:
             text = f"#{t.id} - {t.title}\nPrix actuel : {t.last_price:.2f}"
             link = with_affiliate_tag(t.url)
-            await update.effective_message.reply_text(
-                text, reply_markup=_product_keyboard(t.id, link, include_help=False)
-            )
+            keyboard = _product_keyboard(t.id, link, include_help=False)
+            await _send_product(update, text, keyboard, t.image_url)
 
         await update.effective_message.reply_text(
             "Fin de la liste.", reply_markup=_with_help_button()

@@ -16,6 +16,7 @@ PRICE_SELECTORS = [
 ]
 
 TITLE_SELECTOR = "#productTitle"
+IMAGE_SELECTOR = "#landingImage"
 
 
 class ScrapeError(Exception):
@@ -41,6 +42,9 @@ def fetch_product(url: str) -> dict:
             title_el = page.query_selector(TITLE_SELECTOR)
             title = title_el.inner_text().strip() if title_el else None
 
+            image_el = page.query_selector(IMAGE_SELECTOR)
+            image = image_el.get_attribute("src") if image_el else None
+
             price = None
             for selector in PRICE_SELECTORS:
                 el = page.query_selector(selector)
@@ -54,7 +58,7 @@ def fetch_product(url: str) -> dict:
     if price is None:
         raise ScrapeError("Could not find a price on the page")
 
-    return {"title": title or url, "price": price, "url": final_url}
+    return {"title": title or url, "price": price, "url": final_url, "image": image}
 
 
 def _parse_price(raw: str) -> float | None:
