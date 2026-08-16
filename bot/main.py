@@ -66,6 +66,12 @@ def main() -> None:
         CallbackQueryHandler(handlers.on_untrack_button, pattern=r"^untrack:\d+$")
     )
     application.add_handler(CallbackQueryHandler(handlers.on_help_button, pattern=r"^help$"))
+    application.add_handler(
+        CallbackQueryHandler(handlers.on_menu_track_button, pattern=r"^menu_track$")
+    )
+    application.add_handler(
+        CallbackQueryHandler(handlers.on_menu_list_button, pattern=r"^menu_list$")
+    )
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handlers.on_text))
     application.add_error_handler(on_error)
 

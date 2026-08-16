@@ -1,13 +1,7 @@
 import asyncio
 import logging
 
-from telegram import (
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    KeyboardButton,
-    ReplyKeyboardMarkup,
-    Update,
-)
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
 from affiliate import with_affiliate_tag
@@ -27,13 +21,15 @@ HELP_TEXT = (
     "/help - afficher cette aide"
 )
 
-MAIN_KEYBOARD = ReplyKeyboardMarkup(
-    [
-        [KeyboardButton("/track"), KeyboardButton("/list")],
-        [KeyboardButton("/untrack"), KeyboardButton("/help")],
-    ],
-    resize_keyboard=True,
-)
+
+def _main_menu() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        [
+            [InlineKeyboardButton("🔍 Suivre un produit", callback_data="menu_track")],
+            [InlineKeyboardButton("📋 Mes produits", callback_data="menu_list")],
+            [InlineKeyboardButton("❓ Aide", callback_data="help")],
+        ]
+    )
 
 
 def _with_help_button(rows: list | None = None) -> InlineKeyboardMarkup:
@@ -69,22 +65,22 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     finally:
         session.close()
 
-    await update.message.reply_text(WELCOME_TEXT, reply_markup=MAIN_KEYBOARD)
+    await update.effective_message.reply_text(WELCOME_TEXT, reply_markup=_main_menu())
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data.pop("awaiting_url", None)
-    await update.message.reply_text(HELP_TEXT, reply_markup=MAIN_KEYBOARD)
+    await update.effective_message.reply_text(HELP_TEXT, reply_markup=_main_menu())
 
 
 async def _track_url(update: Update, context: ContextTypes.DEFAULT_TYPE, url: str) -> None:
-    await update.message.reply_text("Récupération du prix en cours...")
+    await update.effective_message.reply_text("Récupération du prix en cours...")
 
     try:
         product = await asyncio.to_thread(fetch_product, url)
     except (ScrapeError, Exception) as exc:
         logger.warning("Scrape failed for %s: %s", url, exc)
-        await update.message.reply_text(
+        await update.effective_message.reply_text(
             "Je n'ai pas réussi à récupérer le prix de ce produit. Vérifie le lien.",
             reply_markup=_with_help_button(),
         )
@@ -108,13 +104,13 @@ async def _track_url(update: Update, context: ContextTypes.DEFAULT_TYPE, url: st
 
     link = with_affiliate_tag(product["url"])
     msg = f"Produit ajouté (#{item_id}) : {product['title']}\nPrix actuel : {product['price']:.2f}"
-    await update.message.reply_text(msg, reply_markup=_product_keyboard(item_id, link))
+    await update.effective_message.reply_text(msg, reply_markup=_product_keyboard(item_id, link))
 
 
 async def track(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not context.args:
         context.user_data["awaiting_url"] = True
-        await update.message.reply_text(
+        await update.effective_message.reply_text(
             "📋 Colle le lien du produit Amazon à suivre ci-dessous.",
             reply_markup=_with_help_button(),
         )
@@ -137,7 +133,7 @@ async def list_tracks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         user = _get_or_create_user(session, update)
         tracks = session.query(Track).filter_by(user_id=user.id).all()
         if not tracks:
-            await update.message.reply_text(
+            await update.effective_message.reply_text(
                 "Tu ne suis aucun produit pour l'instant.", reply_markup=_with_help_button()
             )
             return
@@ -145,11 +141,11 @@ async def list_tracks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         for t in tracks:
             text = f"#{t.id} - {t.title}\nPrix actuel : {t.last_price:.2f}"
             link = with_affiliate_tag(t.url)
-            await update.message.reply_text(
+            await update.effective_message.reply_text(
                 text, reply_markup=_product_keyboard(t.id, link, include_help=False)
             )
 
-        await update.message.reply_text(
+        await update.effective_message.reply_text(
             "Fin de la liste.", reply_markup=_with_help_button()
         )
     finally:
@@ -169,7 +165,7 @@ def _delete_track(session, user: User, track_id: int) -> str | None:
 async def untrack(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data.pop("awaiting_url", None)
     if not context.args:
-        await update.message.reply_text(
+        await update.effective_message.reply_text(
             "Usage : /untrack <id>", reply_markup=_with_help_button()
         )
         return
@@ -177,7 +173,7 @@ async def untrack(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     try:
         track_id = int(context.args[0])
     except ValueError:
-        await update.message.reply_text(
+        await update.effective_message.reply_text(
             "L'id doit être un nombre.", reply_markup=_with_help_button()
         )
         return
@@ -187,14 +183,14 @@ async def untrack(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         user = _get_or_create_user(session, update)
         title = _delete_track(session, user, track_id)
         if title is None:
-            await update.message.reply_text(
+            await update.effective_message.reply_text(
                 "Produit introuvable.", reply_markup=_with_help_button()
             )
             return
     finally:
         session.close()
 
-    await update.message.reply_text(
+    await update.effective_message.reply_text(
         f"Produit #{track_id} supprimé.", reply_markup=_with_help_button()
     )
 
@@ -224,4 +220,18 @@ async def on_untrack_button(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 async def on_help_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
-    await query.message.reply_text(HELP_TEXT, reply_markup=MAIN_KEYBOARD)
+    await query.message.reply_text(HELP_TEXT, reply_markup=_main_menu())
+
+
+async def on_menu_track_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.callback_query.answer()
+    context.user_data["awaiting_url"] = True
+    await update.effective_message.reply_text(
+        "📋 Colle le lien du produit Amazon à suivre ci-dessous.",
+        reply_markup=_with_help_button(),
+    )
+
+
+async def on_menu_list_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.callback_query.answer()
+    await list_tracks(update, context)
