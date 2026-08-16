@@ -53,7 +53,15 @@ async def check_prices(application: Application) -> None:
                 new_price=new_price,
             )
             keyboard = InlineKeyboardMarkup(
-                [[InlineKeyboardButton(t("view_product", lang), url=link)]]
+                [
+                    [InlineKeyboardButton(t("view_product", lang), url=link)],
+                    [
+                        InlineKeyboardButton(
+                            t("delete_product", lang), callback_data=f"untrack:{track_item.id}"
+                        )
+                    ],
+                    [InlineKeyboardButton(t("menu_help", lang), callback_data="help")],
+                ]
             )
 
             await application.bot.send_message(
