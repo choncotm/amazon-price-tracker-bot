@@ -40,13 +40,12 @@ def _with_help_button(rows: list | None = None) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(rows)
 
 
-def _product_keyboard(track_id: int, link: str) -> InlineKeyboardMarkup:
-    return _with_help_button(
-        [
-            [InlineKeyboardButton("Voir le produit", url=link)],
-            [InlineKeyboardButton("🗑 Supprimer ❌", callback_data=f"untrack:{track_id}")],
-        ]
-    )
+def _product_keyboard(track_id: int, link: str, include_help: bool = True) -> InlineKeyboardMarkup:
+    rows = [
+        [InlineKeyboardButton("Voir le produit", url=link)],
+        [InlineKeyboardButton("🗑 Supprimer ❌", callback_data=f"untrack:{track_id}")],
+    ]
+    return _with_help_button(rows) if include_help else InlineKeyboardMarkup(rows)
 
 
 def _get_or_create_user(session, update: Update) -> User:
@@ -130,7 +129,13 @@ async def list_tracks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         for t in tracks:
             text = f"#{t.id} - {t.title}\nPrix actuel : {t.last_price:.2f}"
             link = with_affiliate_tag(t.url)
-            await update.message.reply_text(text, reply_markup=_product_keyboard(t.id, link))
+            await update.message.reply_text(
+                text, reply_markup=_product_keyboard(t.id, link, include_help=False)
+            )
+
+        await update.message.reply_text(
+            "Fin de la liste.", reply_markup=_with_help_button()
+        )
     finally:
         session.close()
 
