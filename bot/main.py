@@ -75,6 +75,7 @@ def main() -> None:
     application.add_handler(CommandHandler("track", handlers.track))
     application.add_handler(CommandHandler("list", handlers.list_tracks))
     application.add_handler(CommandHandler("untrack", handlers.untrack))
+    application.add_handler(CommandHandler("history", handlers.history_command))
     application.add_handler(CommandHandler("language", handlers.language_command))
     application.add_handler(
         CallbackQueryHandler(handlers.on_untrack_button, pattern=r"^untrack:\d+$")

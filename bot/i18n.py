@@ -15,6 +15,7 @@ TRANSLATIONS = {
             "/track <url> - suivre un produit\n"
             "/list - voir mes produits suivis\n"
             "/untrack <id> - arrêter de suivre un produit\n"
+            "/history - consulter l'historique d'un produit\n"
             "/language - changer de langue\n\n"
             "/help - afficher cette aide"
         ),
@@ -57,6 +58,7 @@ TRANSLATIONS = {
             "/track <url> - track a product\n"
             "/list - view your tracked products\n"
             "/untrack <id> - stop tracking a product\n"
+            "/history - view a product's price history\n"
             "/language - change language\n\n"
             "/help - show this help"
         ),
@@ -99,6 +101,7 @@ TRANSLATIONS = {
             "/track <url> - seguir un producto\n"
             "/list - ver tus productos seguidos\n"
             "/untrack <id> - dejar de seguir un producto\n"
+            "/history - ver el historial de precios de un producto\n"
             "/language - cambiar de idioma\n\n"
             "/help - mostrar esta ayuda"
         ),
@@ -142,6 +145,7 @@ TRANSLATIONS = {
             "/track <url> - Produkt verfolgen\n"
             "/list - verfolgte Produkte anzeigen\n"
             "/untrack <id> - Produkt nicht mehr verfolgen\n"
+            "/history - Preisverlauf eines Produkts ansehen\n"
             "/language - Sprache ändern\n\n"
             "/help - diese Hilfe anzeigen"
         ),

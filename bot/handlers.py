@@ -308,8 +308,7 @@ async def on_menu_list_button(update: Update, context: ContextTypes.DEFAULT_TYPE
     await list_tracks(update, context)
 
 
-async def on_menu_history_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.callback_query.answer()
+async def _show_history_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     session = SessionLocal()
     try:
         user = _get_or_create_user(session, update)
@@ -335,6 +334,16 @@ async def on_menu_history_button(update: Update, context: ContextTypes.DEFAULT_T
     await update.effective_message.reply_text(
         t("choose_product_history", lang), reply_markup=_with_help_button(lang, rows)
     )
+
+
+async def history_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    context.user_data.pop("awaiting_url", None)
+    await _show_history_menu(update, context)
+
+
+async def on_menu_history_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.callback_query.answer()
+    await _show_history_menu(update, context)
 
 
 async def on_history_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
