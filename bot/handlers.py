@@ -11,10 +11,9 @@ from scraper import ScrapeError, fetch_product
 
 logger = logging.getLogger(__name__)
 
-WELCOME_TEXT = "Salut ! Utilise les boutons ci-dessous 👇"
-
 HELP_TEXT = (
-    "Salut ! Je surveille des prix Amazon.\n\n"
+    "Salut 👋 Je suis ton assistant de suivi de prix Amazon : "
+    "je surveille les produits que tu m'indiques et je te préviens dès que leur prix change.\n\n"
     "/track <url> - suivre un produit\n"
     "/list - voir mes produits suivis\n"
     "/untrack <id> - arrêter de suivre un produit\n\n"
@@ -65,7 +64,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     finally:
         session.close()
 
-    await update.effective_message.reply_text(WELCOME_TEXT, reply_markup=_main_menu())
+    await update.effective_message.reply_text(HELP_TEXT, reply_markup=_main_menu())
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
