@@ -34,7 +34,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "Salut ! Je surveille des prix Amazon.\n\n"
         "/track <url> - suivre un produit\n"
         "/list - voir mes produits suivis\n"
-        "/untrack <id> - arrêter de suivre un produit\n"
+        "/untrack <id> - arrêter de suivre un produit\n\n"
         "/help - afficher cette aide"
     )
 
