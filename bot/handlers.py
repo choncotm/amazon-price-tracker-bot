@@ -1,7 +1,13 @@
 import asyncio
 import logging
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    KeyboardButton,
+    ReplyKeyboardMarkup,
+    Update,
+)
 from telegram.ext import ContextTypes
 
 from affiliate import with_affiliate_tag
@@ -11,12 +17,34 @@ from scraper import ScrapeError, fetch_product
 
 logger = logging.getLogger(__name__)
 
+HELP_TEXT = (
+    "Salut ! Je surveille des prix Amazon.\n\n"
+    "/track <url> - suivre un produit\n"
+    "/list - voir mes produits suivis\n"
+    "/untrack <id> - arrêter de suivre un produit\n\n"
+    "/help - afficher cette aide"
+)
+
+MAIN_KEYBOARD = ReplyKeyboardMarkup(
+    [
+        [KeyboardButton("/track"), KeyboardButton("/list")],
+        [KeyboardButton("/untrack"), KeyboardButton("/help")],
+    ],
+    resize_keyboard=True,
+)
+
+
+def _with_help_button(rows: list | None = None) -> InlineKeyboardMarkup:
+    rows = list(rows or [])
+    rows.append([InlineKeyboardButton("❓ Aide", callback_data="help")])
+    return InlineKeyboardMarkup(rows)
+
 
 def _product_keyboard(track_id: int, link: str) -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup(
+    return _with_help_button(
         [
             [InlineKeyboardButton("Voir le produit", url=link)],
-            [InlineKeyboardButton("🗑 Supprimer", callback_data=f"untrack:{track_id}")],
+            [InlineKeyboardButton("🗑 Supprimer ❌", callback_data=f"untrack:{track_id}")],
         ]
     )
 
@@ -39,13 +67,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     finally:
         session.close()
 
-    await update.message.reply_text(
-        "Salut ! Je surveille des prix Amazon.\n\n"
-        "/track <url> - suivre un produit\n"
-        "/list - voir mes produits suivis\n"
-        "/untrack <id> - arrêter de suivre un produit\n\n"
-        "/help - afficher cette aide"
-    )
+    await update.message.reply_text(HELP_TEXT, reply_markup=MAIN_KEYBOARD)
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -54,7 +76,9 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 async def track(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not context.args:
-        await update.message.reply_text("Usage : /track <url_amazon>")
+        await update.message.reply_text(
+            "Usage : /track <url_amazon>", reply_markup=_with_help_button()
+        )
         return
 
     url = context.args[0]
@@ -66,7 +90,8 @@ async def track(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     except (ScrapeError, Exception) as exc:
         logger.warning("Scrape failed for %s: %s", url, exc)
         await update.message.reply_text(
-            "Je n'ai pas réussi à récupérer le prix de ce produit. Vérifie le lien."
+            "Je n'ai pas réussi à récupérer le prix de ce produit. Vérifie le lien.",
+            reply_markup=_with_help_button(),
         )
         return
 
@@ -97,7 +122,9 @@ async def list_tracks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         user = _get_or_create_user(session, update)
         tracks = session.query(Track).filter_by(user_id=user.id).all()
         if not tracks:
-            await update.message.reply_text("Tu ne suis aucun produit pour l'instant.")
+            await update.message.reply_text(
+                "Tu ne suis aucun produit pour l'instant.", reply_markup=_with_help_button()
+            )
             return
 
         for t in tracks:
@@ -120,13 +147,17 @@ def _delete_track(session, user: User, track_id: int) -> str | None:
 
 async def untrack(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not context.args:
-        await update.message.reply_text("Usage : /untrack <id>")
+        await update.message.reply_text(
+            "Usage : /untrack <id>", reply_markup=_with_help_button()
+        )
         return
 
     try:
         track_id = int(context.args[0])
     except ValueError:
-        await update.message.reply_text("L'id doit être un nombre.")
+        await update.message.reply_text(
+            "L'id doit être un nombre.", reply_markup=_with_help_button()
+        )
         return
 
     session = SessionLocal()
@@ -134,12 +165,16 @@ async def untrack(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         user = _get_or_create_user(session, update)
         title = _delete_track(session, user, track_id)
         if title is None:
-            await update.message.reply_text("Produit introuvable.")
+            await update.message.reply_text(
+                "Produit introuvable.", reply_markup=_with_help_button()
+            )
             return
     finally:
         session.close()
 
-    await update.message.reply_text(f"Produit #{track_id} supprimé.")
+    await update.message.reply_text(
+        f"Produit #{track_id} supprimé.", reply_markup=_with_help_button()
+    )
 
 
 async def on_untrack_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -152,9 +187,19 @@ async def on_untrack_button(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         user = _get_or_create_user(session, update)
         title = _delete_track(session, user, track_id)
         if title is None:
-            await query.edit_message_text("Produit introuvable ou déjà supprimé.")
+            await query.edit_message_text(
+                "Produit introuvable ou déjà supprimé.", reply_markup=_with_help_button()
+            )
             return
     finally:
         session.close()
 
-    await query.edit_message_text(f"Produit #{track_id} supprimé : {title}")
+    await query.edit_message_text(
+        f"Produit #{track_id} supprimé : {title}", reply_markup=_with_help_button()
+    )
+
+
+async def on_help_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    await query.message.reply_text(HELP_TEXT, reply_markup=MAIN_KEYBOARD)

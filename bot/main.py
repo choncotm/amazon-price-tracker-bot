@@ -58,6 +58,7 @@ def main() -> None:
     application.add_handler(
         CallbackQueryHandler(handlers.on_untrack_button, pattern=r"^untrack:\d+$")
     )
+    application.add_handler(CallbackQueryHandler(handlers.on_help_button, pattern=r"^help$"))
     application.add_error_handler(on_error)
 
     application.run_polling()
