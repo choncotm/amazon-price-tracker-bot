@@ -18,6 +18,7 @@ def _main_menu(lang: str) -> InlineKeyboardMarkup:
         [
             [InlineKeyboardButton(t("menu_track", lang), callback_data="menu_track")],
             [InlineKeyboardButton(t("menu_list", lang), callback_data="menu_list")],
+            [InlineKeyboardButton(t("menu_history", lang), callback_data="menu_history")],
             [InlineKeyboardButton(t("menu_language", lang), callback_data="menu_language")],
             [InlineKeyboardButton(t("menu_help", lang), callback_data="help")],
         ]
@@ -305,6 +306,35 @@ async def on_menu_track_button(update: Update, context: ContextTypes.DEFAULT_TYP
 async def on_menu_list_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.callback_query.answer()
     await list_tracks(update, context)
+
+
+async def on_menu_history_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.callback_query.answer()
+    session = SessionLocal()
+    try:
+        user = _get_or_create_user(session, update)
+        lang = user.language
+        tracks = session.query(Track).filter_by(user_id=user.id).all()
+    finally:
+        session.close()
+
+    if not tracks:
+        await update.effective_message.reply_text(
+            t("list_empty", lang), reply_markup=_with_help_button(lang)
+        )
+        return
+
+    rows = [
+        [
+            InlineKeyboardButton(
+                track_item.title[:40], callback_data=f"history:{track_item.id}"
+            )
+        ]
+        for track_item in tracks
+    ]
+    await update.effective_message.reply_text(
+        t("choose_product_history", lang), reply_markup=_with_help_button(lang, rows)
+    )
 
 
 async def on_history_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

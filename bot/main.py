@@ -90,6 +90,9 @@ def main() -> None:
         CallbackQueryHandler(handlers.on_menu_list_button, pattern=r"^menu_list$")
     )
     application.add_handler(
+        CallbackQueryHandler(handlers.on_menu_history_button, pattern=r"^menu_history$")
+    )
+    application.add_handler(
         CallbackQueryHandler(handlers.on_menu_language_button, pattern=r"^menu_language$")
     )
     application.add_handler(

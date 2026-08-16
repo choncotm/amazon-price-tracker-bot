@@ -22,6 +22,7 @@ TRANSLATIONS = {
         "menu_list": "📋 Mes produits",
         "menu_help": "❓ Aide",
         "menu_language": "🌐 Langue",
+        "menu_history": "📈 Historique",
         "ask_link": "📋 Colle le lien du produit Amazon à suivre ci-dessous.",
         "fetching": "Récupération du prix en cours...",
         "scrape_failed": "Je n'ai pas réussi à récupérer le prix de ce produit. Vérifie le lien.",
@@ -47,6 +48,7 @@ TRANSLATIONS = {
         "history_empty": "Aucun changement de prix à ce jour pour {title}.",
         "history_header": "Historique des prix — {title} :",
         "history_line": "{date} : {sign} {old_price:.2f} -> {new_price:.2f}",
+        "choose_product_history": "📈 Choisis un produit pour voir son historique :",
     },
     "en": {
         "help": (
@@ -62,6 +64,7 @@ TRANSLATIONS = {
         "menu_list": "📋 My products",
         "menu_help": "❓ Help",
         "menu_language": "🌐 Language",
+        "menu_history": "📈 History",
         "ask_link": "📋 Paste the Amazon product link to track below.",
         "fetching": "Fetching the price...",
         "scrape_failed": "I couldn't fetch the price for this product. Check the link.",
@@ -87,6 +90,7 @@ TRANSLATIONS = {
         "history_empty": "No price changes so far for {title}.",
         "history_header": "Price history — {title}:",
         "history_line": "{date}: {sign} {old_price:.2f} -> {new_price:.2f}",
+        "choose_product_history": "📈 Choose a product to see its history:",
     },
     "es": {
         "help": (
@@ -102,6 +106,7 @@ TRANSLATIONS = {
         "menu_list": "📋 Mis productos",
         "menu_help": "❓ Ayuda",
         "menu_language": "🌐 Idioma",
+        "menu_history": "📈 Historial",
         "ask_link": "📋 Pega abajo el enlace del producto de Amazon a seguir.",
         "fetching": "Obteniendo el precio...",
         "scrape_failed": "No pude obtener el precio de este producto. Revisa el enlace.",
@@ -127,6 +132,7 @@ TRANSLATIONS = {
         "history_empty": "Sin cambios de precio hasta la fecha para {title}.",
         "history_header": "Historial de precios — {title}:",
         "history_line": "{date}: {sign} {old_price:.2f} -> {new_price:.2f}",
+        "choose_product_history": "📈 Elige un producto para ver su historial:",
     },
     "de": {
         "help": (
@@ -143,6 +149,7 @@ TRANSLATIONS = {
         "menu_list": "📋 Meine Produkte",
         "menu_help": "❓ Hilfe",
         "menu_language": "🌐 Sprache",
+        "menu_history": "📈 Verlauf",
         "ask_link": "📋 Füge unten den Amazon-Produktlink ein, den du verfolgen möchtest.",
         "fetching": "Preis wird abgerufen...",
         "scrape_failed": "Ich konnte den Preis für dieses Produkt nicht abrufen. Überprüfe den Link.",
@@ -168,6 +175,7 @@ TRANSLATIONS = {
         "history_empty": "Bisher keine Preisänderung für {title}.",
         "history_header": "Preisverlauf — {title}:",
         "history_line": "{date}: {sign} {old_price:.2f} -> {new_price:.2f}",
+        "choose_product_history": "📈 Wähle ein Produkt, um den Verlauf zu sehen:",
     },
 }
 
