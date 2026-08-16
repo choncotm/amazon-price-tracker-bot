@@ -13,7 +13,8 @@ TRANSLATIONS = {
     "fr": {
         "help": (
             "Salut 👋 Je suis ton assistant de suivi de prix Amazon : "
-            "je surveille les produits que tu m'indiques et je te préviens dès que leur prix change.\n\n"
+            "je surveille les produits que tu m'indiques, je vérifie les prix toutes les 3h "
+            "et je te préviens dès qu'ils changent, en gardant un historique fiable de chaque changement.\n\n"
             "/track <url> - suivre un produit\n"
             "/list - voir mes produits suivis\n"
             "/untrack <id> - arrêter de suivre un produit\n"
@@ -59,7 +60,8 @@ TRANSLATIONS = {
     "en": {
         "help": (
             "Hi 👋 I'm your Amazon price-tracking assistant: "
-            "I watch the products you give me and notify you whenever their price changes.\n\n"
+            "I watch the products you give me, check prices every 3 hours, and notify you "
+            "whenever they change, keeping a reliable history of every change.\n\n"
             "/track <url> - track a product\n"
             "/list - view your tracked products\n"
             "/untrack <id> - stop tracking a product\n"
@@ -105,7 +107,8 @@ TRANSLATIONS = {
     "es": {
         "help": (
             "Hola 👋 Soy tu asistente de seguimiento de precios de Amazon: "
-            "vigilo los productos que me indiques y te aviso en cuanto cambie su precio.\n\n"
+            "vigilo los productos que me indiques, reviso los precios cada 3 horas "
+            "y te aviso en cuanto cambien, manteniendo un historial fiable de cada cambio.\n\n"
             "/track <url> - seguir un producto\n"
             "/list - ver tus productos seguidos\n"
             "/untrack <id> - dejar de seguir un producto\n"
@@ -151,8 +154,9 @@ TRANSLATIONS = {
     "de": {
         "help": (
             "Hallo 👋 Ich bin dein Amazon-Preisverfolgungs-Assistent: "
-            "Ich beobachte die Produkte, die du mir angibst, und benachrichtige dich, "
-            "sobald sich der Preis ändert.\n\n"
+            "Ich beobachte die Produkte, die du mir angibst, überprüfe die Preise alle 3 Stunden "
+            "und benachrichtige dich, sobald sie sich ändern, und führe dabei einen zuverlässigen "
+            "Verlauf jeder Änderung.\n\n"
             "/track <url> - Produkt verfolgen\n"
             "/list - verfolgte Produkte anzeigen\n"
             "/untrack <id> - Produkt nicht mehr verfolgen\n"
@@ -198,7 +202,8 @@ TRANSLATIONS = {
     "pt": {
         "help": (
             "Olá 👋 Sou o teu assistente de monitorização de preços da Amazon: "
-            "vigio os produtos que me indicares e aviso-te sempre que o preço mudar.\n\n"
+            "vigio os produtos que me indicares, verifico os preços a cada 3 horas "
+            "e aviso-te sempre que mudarem, mantendo um histórico fiável de cada alteração.\n\n"
             "/track <url> - seguir um produto\n"
             "/list - ver os produtos que segues\n"
             "/untrack <id> - deixar de seguir um produto\n"
@@ -244,7 +249,8 @@ TRANSLATIONS = {
     "ru": {
         "help": (
             "Привет 👋 Я твой помощник по отслеживанию цен на Amazon: "
-            "слежу за товарами, которые ты укажешь, и сообщаю, как только цена изменится.\n\n"
+            "слежу за товарами, которые ты укажешь, проверяю цены каждые 3 часа "
+            "и сообщаю, как только они изменятся, ведя надёжную историю каждого изменения.\n\n"
             "/track <url> - отслеживать товар\n"
             "/list - показать отслеживаемые товары\n"
             "/untrack <id> - перестать отслеживать товар\n"
