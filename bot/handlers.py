@@ -87,13 +87,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     finally:
         session.close()
 
-    await update.effective_message.reply_text(t("help", lang), reply_markup=_main_menu(lang))
+    await update.effective_message.reply_text(t("help", lang), reply_markup=_main_menu(lang), parse_mode="HTML")
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data.pop("awaiting_url", None)
     lang = _get_lang(update)
-    await update.effective_message.reply_text(t("help", lang), reply_markup=_main_menu(lang))
+    await update.effective_message.reply_text(t("help", lang), reply_markup=_main_menu(lang), parse_mode="HTML")
 
 
 async def language_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -144,7 +144,7 @@ async def on_language_button(update: Update, context: ContextTypes.DEFAULT_TYPE)
         session.close()
 
     await query.edit_message_text(t("language_set", lang, name=LANGUAGE_NAMES[lang]))
-    await query.message.reply_text(t("help", lang), reply_markup=_main_menu(lang))
+    await query.message.reply_text(t("help", lang), reply_markup=_main_menu(lang), parse_mode="HTML")
 
 
 async def _track_url(update: Update, context: ContextTypes.DEFAULT_TYPE, url: str, lang: str) -> None:
@@ -310,7 +310,7 @@ async def on_help_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     query = update.callback_query
     await query.answer()
     lang = _get_lang(update)
-    await query.message.reply_text(t("help", lang), reply_markup=_main_menu(lang))
+    await query.message.reply_text(t("help", lang), reply_markup=_main_menu(lang), parse_mode="HTML")
 
 
 async def on_menu_track_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
