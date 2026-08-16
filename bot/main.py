@@ -97,7 +97,7 @@ def main() -> None:
         CallbackQueryHandler(handlers.on_menu_language_button, pattern=r"^menu_language$")
     )
     application.add_handler(
-        CallbackQueryHandler(handlers.on_language_button, pattern=r"^lang:(fr|en|es|de)$")
+        CallbackQueryHandler(handlers.on_language_button, pattern=r"^lang:(fr|en|es|de|pt|ru)$")
     )
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handlers.on_text))
     application.add_error_handler(on_error)

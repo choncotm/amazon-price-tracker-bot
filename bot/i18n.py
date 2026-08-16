@@ -5,6 +5,8 @@ LANGUAGE_NAMES = {
     "en": "English 🇬🇧",
     "es": "Español 🇪🇸",
     "de": "Deutsch 🇩🇪",
+    "pt": "Português 🇵🇹",
+    "ru": "Русский 🇷🇺",
 }
 
 TRANSLATIONS = {
@@ -180,6 +182,92 @@ TRANSLATIONS = {
         "history_header": "Preisverlauf — {title}:",
         "history_line": "{date}: {sign} {old_price:.2f} -> {new_price:.2f}",
         "choose_product_history": "📈 Wähle ein Produkt, um den Verlauf zu sehen:",
+    },
+    "pt": {
+        "help": (
+            "Olá 👋 Sou o teu assistente de monitorização de preços da Amazon: "
+            "vigio os produtos que me indicares e aviso-te sempre que o preço mudar.\n\n"
+            "/track <url> - seguir um produto\n"
+            "/list - ver os produtos que segues\n"
+            "/untrack <id> - deixar de seguir um produto\n"
+            "/history - ver o histórico de preços de um produto\n"
+            "/language - mudar de idioma\n\n"
+            "/help - mostrar esta ajuda"
+        ),
+        "menu_track": "🔍 Seguir um produto",
+        "menu_list": "📋 Os meus produtos",
+        "menu_help": "❓ Ajuda",
+        "menu_language": "🌐 Idioma",
+        "menu_history": "📈 Histórico",
+        "ask_link": "📋 Cola abaixo o link do produto da Amazon a seguir.",
+        "fetching": "A obter o preço...",
+        "scrape_failed": "Não consegui obter o preço deste produto. Verifica o link.",
+        "product_added": "Produto adicionado (#{id}): {title}\n\n💰 Preço atual: {price:.2f}",
+        "view_product": "🔗 Ver produto",
+        "delete_product": "🗑 Eliminar ❌",
+        "history_button": "📈 Histórico",
+        "list_empty": "Ainda não segues nenhum produto.",
+        "list_end": "Fim da lista.",
+        "product_line": "#{id} - {title}\n\n💰 Preço atual: {price:.2f}",
+        "untrack_usage": "Uso: /untrack <id>",
+        "untrack_invalid_id": "O id deve ser um número.",
+        "untrack_not_found": "Produto não encontrado.",
+        "untrack_not_found_button": "Produto não encontrado ou já eliminado.",
+        "untrack_success": "Produto #{id} eliminado.",
+        "untrack_success_button": "Produto #{id} eliminado: {title}",
+        "price_drop": "Descida de preço",
+        "price_rise": "Subida de preço",
+        "price_alert": "{direction}! {title}\n{old_price:.2f} -> {new_price:.2f}",
+        "error": "Ocorreu um erro, tenta novamente.",
+        "choose_language": "🌐 Escolhe o teu idioma:",
+        "language_set": "Idioma atualizado: {name}",
+        "history_empty": "Ainda não há alterações de preço para {title}.",
+        "history_header": "Histórico de preços — {title}:",
+        "history_line": "{date}: {sign} {old_price:.2f} -> {new_price:.2f}",
+        "choose_product_history": "📈 Escolhe um produto para ver o histórico:",
+    },
+    "ru": {
+        "help": (
+            "Привет 👋 Я твой помощник по отслеживанию цен на Amazon: "
+            "слежу за товарами, которые ты укажешь, и сообщаю, как только цена изменится.\n\n"
+            "/track <url> - отслеживать товар\n"
+            "/list - показать отслеживаемые товары\n"
+            "/untrack <id> - перестать отслеживать товар\n"
+            "/history - посмотреть историю цен товара\n"
+            "/language - сменить язык\n\n"
+            "/help - показать эту справку"
+        ),
+        "menu_track": "🔍 Отслеживать товар",
+        "menu_list": "📋 Мои товары",
+        "menu_help": "❓ Помощь",
+        "menu_language": "🌐 Язык",
+        "menu_history": "📈 История",
+        "ask_link": "📋 Вставь ссылку на товар Amazon, который нужно отслеживать.",
+        "fetching": "Получаю цену...",
+        "scrape_failed": "Не удалось получить цену этого товара. Проверь ссылку.",
+        "product_added": "Товар добавлен (#{id}): {title}\n\n💰 Текущая цена: {price:.2f}",
+        "view_product": "🔗 Посмотреть товар",
+        "delete_product": "🗑 Удалить ❌",
+        "history_button": "📈 История",
+        "list_empty": "Ты пока не отслеживаешь ни одного товара.",
+        "list_end": "Конец списка.",
+        "product_line": "#{id} - {title}\n\n💰 Текущая цена: {price:.2f}",
+        "untrack_usage": "Использование: /untrack <id>",
+        "untrack_invalid_id": "ID должен быть числом.",
+        "untrack_not_found": "Товар не найден.",
+        "untrack_not_found_button": "Товар не найден или уже удалён.",
+        "untrack_success": "Товар #{id} удалён.",
+        "untrack_success_button": "Товар #{id} удалён: {title}",
+        "price_drop": "Снижение цены",
+        "price_rise": "Повышение цены",
+        "price_alert": "{direction}! {title}\n{old_price:.2f} -> {new_price:.2f}",
+        "error": "Произошла ошибка, попробуй ещё раз.",
+        "choose_language": "🌐 Выбери язык:",
+        "language_set": "Язык обновлён: {name}",
+        "history_empty": "Пока нет изменений цены для {title}.",
+        "history_header": "История цен — {title}:",
+        "history_line": "{date}: {sign} {old_price:.2f} -> {new_price:.2f}",
+        "choose_product_history": "📈 Выбери товар, чтобы посмотреть историю:",
     },
 }
 
