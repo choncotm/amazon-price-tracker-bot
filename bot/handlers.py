@@ -94,8 +94,11 @@ async def list_tracks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
             await update.message.reply_text("Tu ne suis aucun produit pour l'instant.")
             return
 
-        lines = [f"#{t.id} - {t.title} - {t.last_price:.2f}" for t in tracks]
-        await update.message.reply_text("\n".join(lines))
+        blocks = [
+            f"#{t.id} - {t.title}\nPrix actuel : {t.last_price:.2f}\n{with_affiliate_tag(t.url)}"
+            for t in tracks
+        ]
+        await update.message.reply_text("\n\n".join(blocks))
     finally:
         session.close()
 
