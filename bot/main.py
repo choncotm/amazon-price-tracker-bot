@@ -13,7 +13,9 @@ from telegram.ext import (
 )
 
 import handlers
-from db import Base, engine
+from db import Base, SessionLocal, engine
+from i18n import t
+from models import User
 from scheduler import start_scheduler
 
 load_dotenv()
@@ -34,10 +36,21 @@ async def post_init(application: Application) -> None:
 async def on_error(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
     logger.exception("Unhandled error while processing update", exc_info=context.error)
     if isinstance(update, Update) and update.effective_message:
+        lang = "fr"
+        if update.effective_user:
+            session = SessionLocal()
+            try:
+                user = (
+                    session.query(User)
+                    .filter_by(telegram_id=update.effective_user.id)
+                    .first()
+                )
+                if user:
+                    lang = user.language
+            finally:
+                session.close()
         try:
-            await update.effective_message.reply_text(
-                "Une erreur est survenue, réessaie."
-            )
+            await update.effective_message.reply_text(t("error", lang))
         except Exception:
             logger.exception("Failed to notify user about the error")
 
@@ -62,8 +75,12 @@ def main() -> None:
     application.add_handler(CommandHandler("track", handlers.track))
     application.add_handler(CommandHandler("list", handlers.list_tracks))
     application.add_handler(CommandHandler("untrack", handlers.untrack))
+    application.add_handler(CommandHandler("language", handlers.language_command))
     application.add_handler(
         CallbackQueryHandler(handlers.on_untrack_button, pattern=r"^untrack:\d+$")
+    )
+    application.add_handler(
+        CallbackQueryHandler(handlers.on_history_button, pattern=r"^history:\d+$")
     )
     application.add_handler(CallbackQueryHandler(handlers.on_help_button, pattern=r"^help$"))
     application.add_handler(
@@ -71,6 +88,12 @@ def main() -> None:
     )
     application.add_handler(
         CallbackQueryHandler(handlers.on_menu_list_button, pattern=r"^menu_list$")
+    )
+    application.add_handler(
+        CallbackQueryHandler(handlers.on_menu_language_button, pattern=r"^menu_language$")
+    )
+    application.add_handler(
+        CallbackQueryHandler(handlers.on_language_button, pattern=r"^lang:(fr|en|es|de)$")
     )
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handlers.on_text))
     application.add_error_handler(on_error)

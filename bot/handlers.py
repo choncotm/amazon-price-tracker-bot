@@ -6,43 +6,45 @@ from telegram.ext import ContextTypes
 
 from affiliate import with_affiliate_tag
 from db import SessionLocal
-from models import Track, User
+from i18n import LANGUAGE_NAMES, t
+from models import PriceHistory, Track, User
 from scraper import ScrapeError, fetch_product
 
 logger = logging.getLogger(__name__)
 
-HELP_TEXT = (
-    "Salut 👋 Je suis ton assistant de suivi de prix Amazon : "
-    "je surveille les produits que tu m'indiques et je te préviens dès que leur prix change.\n\n"
-    "/track <url> - suivre un produit\n"
-    "/list - voir mes produits suivis\n"
-    "/untrack <id> - arrêter de suivre un produit\n\n"
-    "/help - afficher cette aide"
-)
 
-
-def _main_menu() -> InlineKeyboardMarkup:
+def _main_menu(lang: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         [
-            [InlineKeyboardButton("🔍 Suivre un produit", callback_data="menu_track")],
-            [InlineKeyboardButton("📋 Mes produits", callback_data="menu_list")],
-            [InlineKeyboardButton("❓ Aide", callback_data="help")],
+            [InlineKeyboardButton(t("menu_track", lang), callback_data="menu_track")],
+            [InlineKeyboardButton(t("menu_list", lang), callback_data="menu_list")],
+            [InlineKeyboardButton(t("menu_language", lang), callback_data="menu_language")],
+            [InlineKeyboardButton(t("menu_help", lang), callback_data="help")],
         ]
     )
 
 
-def _with_help_button(rows: list | None = None) -> InlineKeyboardMarkup:
+def _with_help_button(lang: str, rows: list | None = None) -> InlineKeyboardMarkup:
     rows = list(rows or [])
-    rows.append([InlineKeyboardButton("❓ Aide", callback_data="help")])
+    rows.append([InlineKeyboardButton(t("menu_help", lang), callback_data="help")])
     return InlineKeyboardMarkup(rows)
 
 
-def _product_keyboard(track_id: int, link: str, include_help: bool = True) -> InlineKeyboardMarkup:
+def _product_keyboard(
+    lang: str, track_id: int, link: str, include_help: bool = True
+) -> InlineKeyboardMarkup:
     rows = [
-        [InlineKeyboardButton("Voir le produit", url=link)],
-        [InlineKeyboardButton("🗑 Supprimer ❌", callback_data=f"untrack:{track_id}")],
+        [InlineKeyboardButton(t("view_product", lang), url=link)],
+        [InlineKeyboardButton(t("history_button", lang), callback_data=f"history:{track_id}")],
+        [InlineKeyboardButton(t("delete_product", lang), callback_data=f"untrack:{track_id}")],
     ]
-    return _with_help_button(rows) if include_help else InlineKeyboardMarkup(rows)
+    return _with_help_button(lang, rows) if include_help else InlineKeyboardMarkup(rows)
+
+
+def _language_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        [[InlineKeyboardButton(name, callback_data=f"lang:{code}")] for code, name in LANGUAGE_NAMES.items()]
+    )
 
 
 async def _send_product(
@@ -65,32 +67,75 @@ def _get_or_create_user(session, update: Update) -> User:
     return user
 
 
+def _get_lang(update: Update) -> str:
+    session = SessionLocal()
+    try:
+        return _get_or_create_user(session, update).language
+    finally:
+        session.close()
+
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data.pop("awaiting_url", None)
     session = SessionLocal()
     try:
-        _get_or_create_user(session, update)
+        lang = _get_or_create_user(session, update).language
     finally:
         session.close()
 
-    await update.effective_message.reply_text(HELP_TEXT, reply_markup=_main_menu())
+    await update.effective_message.reply_text(t("help", lang), reply_markup=_main_menu(lang))
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data.pop("awaiting_url", None)
-    await update.effective_message.reply_text(HELP_TEXT, reply_markup=_main_menu())
+    lang = _get_lang(update)
+    await update.effective_message.reply_text(t("help", lang), reply_markup=_main_menu(lang))
 
 
-async def _track_url(update: Update, context: ContextTypes.DEFAULT_TYPE, url: str) -> None:
-    await update.effective_message.reply_text("Récupération du prix en cours...")
+async def language_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    context.user_data.pop("awaiting_url", None)
+    lang = _get_lang(update)
+    await update.effective_message.reply_text(
+        t("choose_language", lang), reply_markup=_language_keyboard()
+    )
+
+
+async def on_menu_language_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.callback_query.answer()
+    lang = _get_lang(update)
+    await update.effective_message.reply_text(
+        t("choose_language", lang), reply_markup=_language_keyboard()
+    )
+
+
+async def on_language_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    lang = query.data.split(":", 1)[1]
+    if lang not in LANGUAGE_NAMES:
+        return
+
+    session = SessionLocal()
+    try:
+        user = _get_or_create_user(session, update)
+        user.language = lang
+        session.commit()
+    finally:
+        session.close()
+
+    await query.edit_message_text(t("language_set", lang, name=LANGUAGE_NAMES[lang]))
+    await query.message.reply_text(t("help", lang), reply_markup=_main_menu(lang))
+
+
+async def _track_url(update: Update, context: ContextTypes.DEFAULT_TYPE, url: str, lang: str) -> None:
+    await update.effective_message.reply_text(t("fetching", lang))
 
     try:
         product = await asyncio.to_thread(fetch_product, url)
     except (ScrapeError, Exception) as exc:
         logger.warning("Scrape failed for %s: %s", url, exc)
         await update.effective_message.reply_text(
-            "Je n'ai pas réussi à récupérer le prix de ce produit. Vérifie le lien.",
-            reply_markup=_with_help_button(),
+            t("scrape_failed", lang), reply_markup=_with_help_button(lang)
         )
         return
 
@@ -112,27 +157,29 @@ async def _track_url(update: Update, context: ContextTypes.DEFAULT_TYPE, url: st
         session.close()
 
     link = with_affiliate_tag(product["url"])
-    msg = f"Produit ajouté (#{item_id}) : {product['title']}\nPrix actuel : {product['price']:.2f}"
-    await _send_product(update, msg, _product_keyboard(item_id, link), product.get("image"))
+    msg = t("product_added", lang, id=item_id, title=product["title"], price=product["price"])
+    await _send_product(update, msg, _product_keyboard(lang, item_id, link), product.get("image"))
 
 
 async def track(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    lang = _get_lang(update)
+
     if not context.args:
         context.user_data["awaiting_url"] = True
         await update.effective_message.reply_text(
-            "📋 Colle le lien du produit Amazon à suivre ci-dessous.",
-            reply_markup=_with_help_button(),
+            t("ask_link", lang), reply_markup=_with_help_button(lang)
         )
         return
 
     context.user_data.pop("awaiting_url", None)
-    await _track_url(update, context, context.args[0])
+    await _track_url(update, context, context.args[0], lang)
 
 
 async def on_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not context.user_data.pop("awaiting_url", False):
         return
-    await _track_url(update, context, update.message.text.strip())
+    lang = _get_lang(update)
+    await _track_url(update, context, update.message.text.strip(), lang)
 
 
 async def list_tracks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -140,21 +187,28 @@ async def list_tracks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     session = SessionLocal()
     try:
         user = _get_or_create_user(session, update)
+        lang = user.language
         tracks = session.query(Track).filter_by(user_id=user.id).all()
         if not tracks:
             await update.effective_message.reply_text(
-                "Tu ne suis aucun produit pour l'instant.", reply_markup=_with_help_button()
+                t("list_empty", lang), reply_markup=_with_help_button(lang)
             )
             return
 
-        for t in tracks:
-            text = f"#{t.id} - {t.title}\nPrix actuel : {t.last_price:.2f}"
-            link = with_affiliate_tag(t.url)
-            keyboard = _product_keyboard(t.id, link, include_help=False)
-            await _send_product(update, text, keyboard, t.image_url)
+        for track_item in tracks:
+            text = t(
+                "product_line",
+                lang,
+                id=track_item.id,
+                title=track_item.title,
+                price=track_item.last_price,
+            )
+            link = with_affiliate_tag(track_item.url)
+            keyboard = _product_keyboard(lang, track_item.id, link, include_help=False)
+            await _send_product(update, text, keyboard, track_item.image_url)
 
         await update.effective_message.reply_text(
-            "Fin de la liste.", reply_markup=_with_help_button()
+            t("list_end", lang), reply_markup=_with_help_button(lang)
         )
     finally:
         session.close()
@@ -172,34 +226,36 @@ def _delete_track(session, user: User, track_id: int) -> str | None:
 
 async def untrack(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data.pop("awaiting_url", None)
-    if not context.args:
-        await update.effective_message.reply_text(
-            "Usage : /untrack <id>", reply_markup=_with_help_button()
-        )
-        return
-
-    try:
-        track_id = int(context.args[0])
-    except ValueError:
-        await update.effective_message.reply_text(
-            "L'id doit être un nombre.", reply_markup=_with_help_button()
-        )
-        return
-
     session = SessionLocal()
     try:
         user = _get_or_create_user(session, update)
+        lang = user.language
+
+        if not context.args:
+            await update.effective_message.reply_text(
+                t("untrack_usage", lang), reply_markup=_with_help_button(lang)
+            )
+            return
+
+        try:
+            track_id = int(context.args[0])
+        except ValueError:
+            await update.effective_message.reply_text(
+                t("untrack_invalid_id", lang), reply_markup=_with_help_button(lang)
+            )
+            return
+
         title = _delete_track(session, user, track_id)
         if title is None:
             await update.effective_message.reply_text(
-                "Produit introuvable.", reply_markup=_with_help_button()
+                t("untrack_not_found", lang), reply_markup=_with_help_button(lang)
             )
             return
     finally:
         session.close()
 
     await update.effective_message.reply_text(
-        f"Produit #{track_id} supprimé.", reply_markup=_with_help_button()
+        t("untrack_success", lang, id=track_id), reply_markup=_with_help_button(lang)
     )
 
 
@@ -211,35 +267,86 @@ async def on_untrack_button(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     session = SessionLocal()
     try:
         user = _get_or_create_user(session, update)
+        lang = user.language
         title = _delete_track(session, user, track_id)
         if title is None:
             await query.edit_message_text(
-                "Produit introuvable ou déjà supprimé.", reply_markup=_with_help_button()
+                t("untrack_not_found_button", lang), reply_markup=_with_help_button(lang)
             )
             return
     finally:
         session.close()
 
     await query.edit_message_text(
-        f"Produit #{track_id} supprimé : {title}", reply_markup=_with_help_button()
+        t("untrack_success_button", lang, id=track_id, title=title),
+        reply_markup=_with_help_button(lang),
     )
 
 
 async def on_help_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
-    await query.message.reply_text(HELP_TEXT, reply_markup=_main_menu())
+    lang = _get_lang(update)
+    await query.message.reply_text(t("help", lang), reply_markup=_main_menu(lang))
 
 
 async def on_menu_track_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.callback_query.answer()
+    lang = _get_lang(update)
     context.user_data["awaiting_url"] = True
     await update.effective_message.reply_text(
-        "📋 Colle le lien du produit Amazon à suivre ci-dessous.",
-        reply_markup=_with_help_button(),
+        t("ask_link", lang), reply_markup=_with_help_button(lang)
     )
 
 
 async def on_menu_list_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.callback_query.answer()
     await list_tracks(update, context)
+
+
+async def on_history_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    track_id = int(query.data.split(":", 1)[1])
+
+    session = SessionLocal()
+    try:
+        user = _get_or_create_user(session, update)
+        lang = user.language
+        track_item = session.query(Track).filter_by(id=track_id, user_id=user.id).first()
+        if track_item is None:
+            await query.message.reply_text(
+                t("untrack_not_found_button", lang), reply_markup=_with_help_button(lang)
+            )
+            return
+
+        title = track_item.title
+        history = (
+            session.query(PriceHistory)
+            .filter_by(track_id=track_id)
+            .order_by(PriceHistory.checked_at.asc())
+            .all()
+        )
+        entries = [(h.checked_at, h.old_price, h.new_price) for h in history]
+    finally:
+        session.close()
+
+    if not entries:
+        text = t("history_empty", lang, title=title)
+    else:
+        lines = [t("history_header", lang, title=title)]
+        for checked_at, old_price, new_price in entries:
+            sign = "+" if new_price > old_price else "-"
+            lines.append(
+                t(
+                    "history_line",
+                    lang,
+                    date=checked_at.strftime("%d/%m/%Y %H:%M"),
+                    sign=sign,
+                    old_price=old_price,
+                    new_price=new_price,
+                )
+            )
+        text = "\n".join(lines)
+
+    await query.message.reply_text(text, reply_markup=_with_help_button(lang))

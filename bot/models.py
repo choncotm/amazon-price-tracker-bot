@@ -12,6 +12,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     telegram_id = Column(BigInteger, unique=True, nullable=False)
     chat_id = Column(BigInteger, nullable=False)
+    language = Column(String(8), nullable=False, default="fr")
     created_at = Column(DateTime, default=datetime.utcnow)
 
     tracks = relationship("Track", back_populates="user", cascade="all, delete-orphan")
@@ -38,7 +39,8 @@ class PriceHistory(Base):
 
     id = Column(Integer, primary_key=True)
     track_id = Column(Integer, ForeignKey("tracks.id"), nullable=False)
-    price = Column(Float, nullable=False)
+    old_price = Column(Float, nullable=False)
+    new_price = Column(Float, nullable=False)
     checked_at = Column(DateTime, default=datetime.utcnow)
 
     track = relationship("Track", back_populates="history")
