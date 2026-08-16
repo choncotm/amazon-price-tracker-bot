@@ -20,6 +20,7 @@ def _main_menu(lang: str) -> InlineKeyboardMarkup:
             [InlineKeyboardButton(t("menu_list", lang), callback_data="menu_list")],
             [InlineKeyboardButton(t("menu_history", lang), callback_data="menu_history")],
             [InlineKeyboardButton(t("menu_language", lang), callback_data="menu_language")],
+            [InlineKeyboardButton(t("menu_contact", lang), callback_data="menu_contact")],
             [InlineKeyboardButton(t("menu_help", lang), callback_data="help")],
         ]
     )
@@ -106,6 +107,22 @@ async def on_menu_language_button(update: Update, context: ContextTypes.DEFAULT_
     lang = _get_lang(update)
     await update.effective_message.reply_text(
         t("choose_language", lang), reply_markup=_language_keyboard()
+    )
+
+
+async def contact_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    context.user_data.pop("awaiting_url", None)
+    lang = _get_lang(update)
+    await update.effective_message.reply_text(
+        t("contact_text", lang), reply_markup=_with_help_button(lang)
+    )
+
+
+async def on_menu_contact_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.callback_query.answer()
+    lang = _get_lang(update)
+    await update.effective_message.reply_text(
+        t("contact_text", lang), reply_markup=_with_help_button(lang)
     )
 
 

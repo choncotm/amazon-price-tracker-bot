@@ -18,7 +18,8 @@ TRANSLATIONS = {
             "/list - voir mes produits suivis\n"
             "/untrack <id> - arrêter de suivre un produit\n"
             "/history - consulter l'historique d'un produit\n"
-            "/language - changer de langue\n\n"
+            "/language - changer de langue\n"
+            "/contact - me contacter\n\n"
             "/help - afficher cette aide"
         ),
         "menu_track": "🔍 Suivre un produit",
@@ -26,6 +27,7 @@ TRANSLATIONS = {
         "menu_help": "❓ Aide",
         "menu_language": "🌐 Langue",
         "menu_history": "📈 Historique",
+        "menu_contact": "📞 Contact",
         "ask_link": "📋 Colle le lien du produit Amazon à suivre ci-dessous.",
         "fetching": "Récupération du prix en cours...",
         "scrape_failed": "Je n'ai pas réussi à récupérer le prix de ce produit. Vérifie le lien.",
@@ -52,6 +54,7 @@ TRANSLATIONS = {
         "history_header": "Historique des prix — {title} :",
         "history_line": "{date} : {sign} {old_price:.2f} -> {new_price:.2f}",
         "choose_product_history": "📈 Choisis un produit pour voir son historique :",
+        "contact_text": "📞 Contact\n\nGitHub : github.com/choncotm\nSite web : choncotm.com\nEmail : choncotmexe@outlook.com",
     },
     "en": {
         "help": (
@@ -61,7 +64,8 @@ TRANSLATIONS = {
             "/list - view your tracked products\n"
             "/untrack <id> - stop tracking a product\n"
             "/history - view a product's price history\n"
-            "/language - change language\n\n"
+            "/language - change language\n"
+            "/contact - contact me\n\n"
             "/help - show this help"
         ),
         "menu_track": "🔍 Track a product",
@@ -69,6 +73,7 @@ TRANSLATIONS = {
         "menu_help": "❓ Help",
         "menu_language": "🌐 Language",
         "menu_history": "📈 History",
+        "menu_contact": "📞 Contact",
         "ask_link": "📋 Paste the Amazon product link to track below.",
         "fetching": "Fetching the price...",
         "scrape_failed": "I couldn't fetch the price for this product. Check the link.",
@@ -95,6 +100,7 @@ TRANSLATIONS = {
         "history_header": "Price history — {title}:",
         "history_line": "{date}: {sign} {old_price:.2f} -> {new_price:.2f}",
         "choose_product_history": "📈 Choose a product to see its history:",
+        "contact_text": "📞 Contact\n\nGitHub: github.com/choncotm\nWebsite: choncotm.com\nEmail: choncotmexe@outlook.com",
     },
     "es": {
         "help": (
@@ -104,7 +110,8 @@ TRANSLATIONS = {
             "/list - ver tus productos seguidos\n"
             "/untrack <id> - dejar de seguir un producto\n"
             "/history - ver el historial de precios de un producto\n"
-            "/language - cambiar de idioma\n\n"
+            "/language - cambiar de idioma\n"
+            "/contact - contactarme\n\n"
             "/help - mostrar esta ayuda"
         ),
         "menu_track": "🔍 Seguir un producto",
@@ -112,6 +119,7 @@ TRANSLATIONS = {
         "menu_help": "❓ Ayuda",
         "menu_language": "🌐 Idioma",
         "menu_history": "📈 Historial",
+        "menu_contact": "📞 Contacto",
         "ask_link": "📋 Pega abajo el enlace del producto de Amazon a seguir.",
         "fetching": "Obteniendo el precio...",
         "scrape_failed": "No pude obtener el precio de este producto. Revisa el enlace.",
@@ -138,6 +146,7 @@ TRANSLATIONS = {
         "history_header": "Historial de precios — {title}:",
         "history_line": "{date}: {sign} {old_price:.2f} -> {new_price:.2f}",
         "choose_product_history": "📈 Elige un producto para ver su historial:",
+        "contact_text": "📞 Contacto\n\nGitHub: github.com/choncotm\nSitio web: choncotm.com\nCorreo: choncotmexe@outlook.com",
     },
     "de": {
         "help": (
@@ -148,7 +157,8 @@ TRANSLATIONS = {
             "/list - verfolgte Produkte anzeigen\n"
             "/untrack <id> - Produkt nicht mehr verfolgen\n"
             "/history - Preisverlauf eines Produkts ansehen\n"
-            "/language - Sprache ändern\n\n"
+            "/language - Sprache ändern\n"
+            "/contact - Kontakt zu mir\n\n"
             "/help - diese Hilfe anzeigen"
         ),
         "menu_track": "🔍 Produkt verfolgen",
@@ -156,6 +166,7 @@ TRANSLATIONS = {
         "menu_help": "❓ Hilfe",
         "menu_language": "🌐 Sprache",
         "menu_history": "📈 Verlauf",
+        "menu_contact": "📞 Kontakt",
         "ask_link": "📋 Füge unten den Amazon-Produktlink ein, den du verfolgen möchtest.",
         "fetching": "Preis wird abgerufen...",
         "scrape_failed": "Ich konnte den Preis für dieses Produkt nicht abrufen. Überprüfe den Link.",
@@ -182,6 +193,7 @@ TRANSLATIONS = {
         "history_header": "Preisverlauf — {title}:",
         "history_line": "{date}: {sign} {old_price:.2f} -> {new_price:.2f}",
         "choose_product_history": "📈 Wähle ein Produkt, um den Verlauf zu sehen:",
+        "contact_text": "📞 Kontakt\n\nGitHub: github.com/choncotm\nWebsite: choncotm.com\nE-Mail: choncotmexe@outlook.com",
     },
     "pt": {
         "help": (
@@ -191,7 +203,8 @@ TRANSLATIONS = {
             "/list - ver os produtos que segues\n"
             "/untrack <id> - deixar de seguir um produto\n"
             "/history - ver o histórico de preços de um produto\n"
-            "/language - mudar de idioma\n\n"
+            "/language - mudar de idioma\n"
+            "/contact - contactar-me\n\n"
             "/help - mostrar esta ajuda"
         ),
         "menu_track": "🔍 Seguir um produto",
@@ -199,6 +212,7 @@ TRANSLATIONS = {
         "menu_help": "❓ Ajuda",
         "menu_language": "🌐 Idioma",
         "menu_history": "📈 Histórico",
+        "menu_contact": "📞 Contacto",
         "ask_link": "📋 Cola abaixo o link do produto da Amazon a seguir.",
         "fetching": "A obter o preço...",
         "scrape_failed": "Não consegui obter o preço deste produto. Verifica o link.",
@@ -225,6 +239,7 @@ TRANSLATIONS = {
         "history_header": "Histórico de preços — {title}:",
         "history_line": "{date}: {sign} {old_price:.2f} -> {new_price:.2f}",
         "choose_product_history": "📈 Escolhe um produto para ver o histórico:",
+        "contact_text": "📞 Contacto\n\nGitHub: github.com/choncotm\nSite: choncotm.com\nEmail: choncotmexe@outlook.com",
     },
     "ru": {
         "help": (
@@ -234,7 +249,8 @@ TRANSLATIONS = {
             "/list - показать отслеживаемые товары\n"
             "/untrack <id> - перестать отслеживать товар\n"
             "/history - посмотреть историю цен товара\n"
-            "/language - сменить язык\n\n"
+            "/language - сменить язык\n"
+            "/contact - связаться со мной\n\n"
             "/help - показать эту справку"
         ),
         "menu_track": "🔍 Отслеживать товар",
@@ -242,6 +258,7 @@ TRANSLATIONS = {
         "menu_help": "❓ Помощь",
         "menu_language": "🌐 Язык",
         "menu_history": "📈 История",
+        "menu_contact": "📞 Контакты",
         "ask_link": "📋 Вставь ссылку на товар Amazon, который нужно отслеживать.",
         "fetching": "Получаю цену...",
         "scrape_failed": "Не удалось получить цену этого товара. Проверь ссылку.",
@@ -268,6 +285,7 @@ TRANSLATIONS = {
         "history_header": "История цен — {title}:",
         "history_line": "{date}: {sign} {old_price:.2f} -> {new_price:.2f}",
         "choose_product_history": "📈 Выбери товар, чтобы посмотреть историю:",
+        "contact_text": "📞 Контакты\n\nGitHub: github.com/choncotm\nСайт: choncotm.com\nEmail: choncotmexe@outlook.com",
     },
 }
 

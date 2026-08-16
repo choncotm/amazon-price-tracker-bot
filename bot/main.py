@@ -77,6 +77,7 @@ def main() -> None:
     application.add_handler(CommandHandler("untrack", handlers.untrack))
     application.add_handler(CommandHandler("history", handlers.history_command))
     application.add_handler(CommandHandler("language", handlers.language_command))
+    application.add_handler(CommandHandler("contact", handlers.contact_command))
     application.add_handler(
         CallbackQueryHandler(handlers.on_untrack_button, pattern=r"^untrack:\d+$")
     )
@@ -95,6 +96,9 @@ def main() -> None:
     )
     application.add_handler(
         CallbackQueryHandler(handlers.on_menu_language_button, pattern=r"^menu_language$")
+    )
+    application.add_handler(
+        CallbackQueryHandler(handlers.on_menu_contact_button, pattern=r"^menu_contact$")
     )
     application.add_handler(
         CallbackQueryHandler(handlers.on_language_button, pattern=r"^lang:(fr|en|es|de|pt|ru)$")
