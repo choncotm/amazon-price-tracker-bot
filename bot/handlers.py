@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from urllib.parse import quote
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
@@ -11,6 +12,12 @@ from models import PriceHistory, Track, User
 from scraper import ScrapeError, fetch_product
 
 logger = logging.getLogger(__name__)
+
+BOT_LINK = "https://t.me/amazon_pricetracker_v0_bot"
+
+
+def _share_dialog_url(lang: str) -> str:
+    return f"https://t.me/share/url?url={quote(BOT_LINK)}&text={quote(t('share_caption', lang))}"
 
 
 def _main_menu(lang: str) -> InlineKeyboardMarkup:
@@ -24,6 +31,7 @@ def _main_menu(lang: str) -> InlineKeyboardMarkup:
                 InlineKeyboardButton(t("menu_contact", lang), callback_data="menu_contact"),
             ],
             [InlineKeyboardButton(t("menu_help", lang), callback_data="help")],
+            [InlineKeyboardButton(t("menu_share", lang), callback_data="menu_share")],
         ]
     )
 
@@ -126,6 +134,15 @@ async def on_menu_contact_button(update: Update, context: ContextTypes.DEFAULT_T
     await update.effective_message.reply_text(
         t("contact_text", lang), reply_markup=_with_help_button(lang)
     )
+
+
+async def on_menu_share_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.callback_query.answer()
+    lang = _get_lang(update)
+    keyboard = _with_help_button(
+        lang, [[InlineKeyboardButton(t("share_open_button", lang), url=_share_dialog_url(lang))]]
+    )
+    await update.effective_message.reply_text(t("share_message", lang), reply_markup=keyboard)
 
 
 async def on_language_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

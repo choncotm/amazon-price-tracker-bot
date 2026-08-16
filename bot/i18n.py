@@ -30,6 +30,7 @@ TRANSLATIONS = {
         "menu_language": "🌐 Langue",
         "menu_history": "📈 Historique",
         "menu_contact": "📞 Contact",
+        "menu_share": "📤 Partager",
         "ask_link": "📋 Colle le lien du produit Amazon à suivre ci-dessous.",
         "fetching": "Récupération du prix en cours...",
         "scrape_failed": "Je n'ai pas réussi à récupérer le prix de ce produit. Vérifie le lien.",
@@ -57,6 +58,9 @@ TRANSLATIONS = {
         "history_line": "{date} : {sign} {old_price:.2f} -> {new_price:.2f}",
         "choose_product_history": "📈 Choisis un produit pour voir son historique :",
         "contact_text": "📞 Contact\n\nGitHub : github.com/choncotm\nSite web : choncotm.com\nEmail : choncotmexe@outlook.com",
+        "share_message": "🤖 Voici le lien de mon bot :\n\nhttps://t.me/amazon_pricetracker_v0_bot\n\nAppuie longuement sur le lien pour le copier, ou utilise le bouton ci-dessous pour le partager directement.",
+        "share_open_button": "📤 Partager directement",
+        "share_caption": "Suis les prix Amazon avec ce bot 🤖",
     },
     "en": {
         "help": (
@@ -78,6 +82,7 @@ TRANSLATIONS = {
         "menu_language": "🌐 Language",
         "menu_history": "📈 History",
         "menu_contact": "📞 Contact",
+        "menu_share": "📤 Share",
         "ask_link": "📋 Paste the Amazon product link to track below.",
         "fetching": "Fetching the price...",
         "scrape_failed": "I couldn't fetch the price for this product. Check the link.",
@@ -105,6 +110,9 @@ TRANSLATIONS = {
         "history_line": "{date}: {sign} {old_price:.2f} -> {new_price:.2f}",
         "choose_product_history": "📈 Choose a product to see its history:",
         "contact_text": "📞 Contact\n\nGitHub: github.com/choncotm\nWebsite: choncotm.com\nEmail: choncotmexe@outlook.com",
+        "share_message": "🤖 Here is my bot's link:\n\nhttps://t.me/amazon_pricetracker_v0_bot\n\nPress and hold the link to copy it, or use the button below to share it directly.",
+        "share_open_button": "📤 Share directly",
+        "share_caption": "Track Amazon prices with this bot 🤖",
     },
     "es": {
         "help": (
@@ -126,6 +134,7 @@ TRANSLATIONS = {
         "menu_language": "🌐 Idioma",
         "menu_history": "📈 Historial",
         "menu_contact": "📞 Contacto",
+        "menu_share": "📤 Compartir",
         "ask_link": "📋 Pega abajo el enlace del producto de Amazon a seguir.",
         "fetching": "Obteniendo el precio...",
         "scrape_failed": "No pude obtener el precio de este producto. Revisa el enlace.",
@@ -153,6 +162,9 @@ TRANSLATIONS = {
         "history_line": "{date}: {sign} {old_price:.2f} -> {new_price:.2f}",
         "choose_product_history": "📈 Elige un producto para ver su historial:",
         "contact_text": "📞 Contacto\n\nGitHub: github.com/choncotm\nSitio web: choncotm.com\nCorreo: choncotmexe@outlook.com",
+        "share_message": "🤖 Aquí tienes el enlace de mi bot:\n\nhttps://t.me/amazon_pricetracker_v0_bot\n\nMantén pulsado el enlace para copiarlo, o usa el botón de abajo para compartirlo directamente.",
+        "share_open_button": "📤 Compartir directamente",
+        "share_caption": "Sigue los precios de Amazon con este bot 🤖",
     },
     "de": {
         "help": (
@@ -174,6 +186,7 @@ TRANSLATIONS = {
         "menu_language": "🌐 Sprache",
         "menu_history": "📈 Verlauf",
         "menu_contact": "📞 Kontakt",
+        "menu_share": "📤 Teilen",
         "ask_link": "📋 Füge unten den Amazon-Produktlink ein, den du verfolgen möchtest.",
         "fetching": "Preis wird abgerufen...",
         "scrape_failed": "Ich konnte den Preis für dieses Produkt nicht abrufen. Überprüfe den Link.",
@@ -201,6 +214,9 @@ TRANSLATIONS = {
         "history_line": "{date}: {sign} {old_price:.2f} -> {new_price:.2f}",
         "choose_product_history": "📈 Wähle ein Produkt, um den Verlauf zu sehen:",
         "contact_text": "📞 Kontakt\n\nGitHub: github.com/choncotm\nWebsite: choncotm.com\nE-Mail: choncotmexe@outlook.com",
+        "share_message": "🤖 Hier ist der Link zu meinem Bot:\n\nhttps://t.me/amazon_pricetracker_v0_bot\n\nHalte den Link gedrückt, um ihn zu kopieren, oder nutze den Button unten, um ihn direkt zu teilen.",
+        "share_open_button": "📤 Direkt teilen",
+        "share_caption": "Verfolge Amazon-Preise mit diesem Bot 🤖",
     },
     "pt": {
         "help": (
@@ -222,6 +238,7 @@ TRANSLATIONS = {
         "menu_language": "🌐 Idioma",
         "menu_history": "📈 Histórico",
         "menu_contact": "📞 Contacto",
+        "menu_share": "📤 Partilhar",
         "ask_link": "📋 Cola abaixo o link do produto da Amazon a seguir.",
         "fetching": "A obter o preço...",
         "scrape_failed": "Não consegui obter o preço deste produto. Verifica o link.",
@@ -249,6 +266,9 @@ TRANSLATIONS = {
         "history_line": "{date}: {sign} {old_price:.2f} -> {new_price:.2f}",
         "choose_product_history": "📈 Escolhe um produto para ver o histórico:",
         "contact_text": "📞 Contacto\n\nGitHub: github.com/choncotm\nSite: choncotm.com\nEmail: choncotmexe@outlook.com",
+        "share_message": "🤖 Aqui está o link do meu bot:\n\nhttps://t.me/amazon_pricetracker_v0_bot\n\nMantém premido o link para o copiar, ou usa o botão abaixo para o partilhar diretamente.",
+        "share_open_button": "📤 Partilhar diretamente",
+        "share_caption": "Acompanha os preços da Amazon com este bot 🤖",
     },
     "ru": {
         "help": (
@@ -270,6 +290,7 @@ TRANSLATIONS = {
         "menu_language": "🌐 Язык",
         "menu_history": "📈 История",
         "menu_contact": "📞 Контакты",
+        "menu_share": "📤 Поделиться",
         "ask_link": "📋 Вставь ссылку на товар Amazon, который нужно отслеживать.",
         "fetching": "Получаю цену...",
         "scrape_failed": "Не удалось получить цену этого товара. Проверь ссылку.",
@@ -297,6 +318,9 @@ TRANSLATIONS = {
         "history_line": "{date}: {sign} {old_price:.2f} -> {new_price:.2f}",
         "choose_product_history": "📈 Выбери товар, чтобы посмотреть историю:",
         "contact_text": "📞 Контакты\n\nGitHub: github.com/choncotm\nСайт: choncotm.com\nEmail: choncotmexe@outlook.com",
+        "share_message": "🤖 Вот ссылка на мой бот:\n\nhttps://t.me/amazon_pricetracker_v0_bot\n\nЗажми ссылку, чтобы скопировать её, или используй кнопку ниже, чтобы поделиться напрямую.",
+        "share_open_button": "📤 Поделиться напрямую",
+        "share_caption": "Отслеживай цены на Amazon с этим ботом 🤖",
     },
 }
 
