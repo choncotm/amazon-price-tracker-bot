@@ -19,8 +19,10 @@ def _main_menu(lang: str) -> InlineKeyboardMarkup:
             [InlineKeyboardButton(t("menu_track", lang), callback_data="menu_track")],
             [InlineKeyboardButton(t("menu_list", lang), callback_data="menu_list")],
             [InlineKeyboardButton(t("menu_history", lang), callback_data="menu_history")],
-            [InlineKeyboardButton(t("menu_language", lang), callback_data="menu_language")],
-            [InlineKeyboardButton(t("menu_contact", lang), callback_data="menu_contact")],
+            [
+                InlineKeyboardButton(t("menu_language", lang), callback_data="menu_language"),
+                InlineKeyboardButton(t("menu_contact", lang), callback_data="menu_contact"),
+            ],
             [InlineKeyboardButton(t("menu_help", lang), callback_data="help")],
         ]
     )
