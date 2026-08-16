@@ -269,18 +269,21 @@ async def on_untrack_button(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         user = _get_or_create_user(session, update)
         lang = user.language
         title = _delete_track(session, user, track_id)
-        if title is None:
-            await query.edit_message_text(
-                t("untrack_not_found_button", lang), reply_markup=_with_help_button(lang)
-            )
-            return
     finally:
         session.close()
 
-    await query.edit_message_text(
-        t("untrack_success_button", lang, id=track_id, title=title),
-        reply_markup=_with_help_button(lang),
-    )
+    chat_id = query.message.chat_id
+    try:
+        await query.message.delete()
+    except Exception:
+        logger.exception("Failed to delete product message for track #%s", track_id)
+
+    if title is None:
+        text = t("untrack_not_found_button", lang)
+    else:
+        text = t("untrack_success_button", lang, id=track_id, title=title)
+
+    await context.bot.send_message(chat_id=chat_id, text=text, reply_markup=_with_help_button(lang))
 
 
 async def on_help_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
