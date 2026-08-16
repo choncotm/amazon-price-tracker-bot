@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from telegram import Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
 from affiliate import with_affiliate_tag
@@ -10,6 +10,15 @@ from models import Track, User
 from scraper import ScrapeError, fetch_product
 
 logger = logging.getLogger(__name__)
+
+
+def _product_keyboard(track_id: int, link: str) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        [
+            [InlineKeyboardButton("Voir le produit", url=link)],
+            [InlineKeyboardButton("🗑 Supprimer", callback_data=f"untrack:{track_id}")],
+        ]
+    )
 
 
 def _get_or_create_user(session, update: Update) -> User:
@@ -78,11 +87,8 @@ async def track(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         session.close()
 
     link = with_affiliate_tag(product["url"])
-    msg = (
-        f"Produit ajouté (#{item_id}) : {product['title']}\n"
-        f"Prix actuel : {product['price']:.2f}\n{link}"
-    )
-    await update.message.reply_text(msg)
+    msg = f"Produit ajouté (#{item_id}) : {product['title']}\nPrix actuel : {product['price']:.2f}"
+    await update.message.reply_text(msg, reply_markup=_product_keyboard(item_id, link))
 
 
 async def list_tracks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -94,13 +100,22 @@ async def list_tracks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
             await update.message.reply_text("Tu ne suis aucun produit pour l'instant.")
             return
 
-        blocks = [
-            f"#{t.id} - {t.title}\nPrix actuel : {t.last_price:.2f}\n{with_affiliate_tag(t.url)}"
-            for t in tracks
-        ]
-        await update.message.reply_text("\n\n".join(blocks))
+        for t in tracks:
+            text = f"#{t.id} - {t.title}\nPrix actuel : {t.last_price:.2f}"
+            link = with_affiliate_tag(t.url)
+            await update.message.reply_text(text, reply_markup=_product_keyboard(t.id, link))
     finally:
         session.close()
+
+
+def _delete_track(session, user: User, track_id: int) -> str | None:
+    item = session.query(Track).filter_by(id=track_id, user_id=user.id).first()
+    if item is None:
+        return None
+    title = item.title
+    session.delete(item)
+    session.commit()
+    return title
 
 
 async def untrack(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -117,13 +132,29 @@ async def untrack(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     session = SessionLocal()
     try:
         user = _get_or_create_user(session, update)
-        item = session.query(Track).filter_by(id=track_id, user_id=user.id).first()
-        if item is None:
+        title = _delete_track(session, user, track_id)
+        if title is None:
             await update.message.reply_text("Produit introuvable.")
             return
-        session.delete(item)
-        session.commit()
     finally:
         session.close()
 
     await update.message.reply_text(f"Produit #{track_id} supprimé.")
+
+
+async def on_untrack_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    track_id = int(query.data.split(":", 1)[1])
+
+    session = SessionLocal()
+    try:
+        user = _get_or_create_user(session, update)
+        title = _delete_track(session, user, track_id)
+        if title is None:
+            await query.edit_message_text("Produit introuvable ou déjà supprimé.")
+            return
+    finally:
+        session.close()
+
+    await query.edit_message_text(f"Produit #{track_id} supprimé : {title}")

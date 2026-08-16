@@ -2,6 +2,7 @@ import asyncio
 import logging
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application
 
 from affiliate import with_affiliate_tag
@@ -36,10 +37,13 @@ async def check_prices(application: Application) -> None:
 
                 direction = "Baisse" if new_price < old_price else "Hausse"
                 link = with_affiliate_tag(t.url)
-                text = f"{direction} de prix ! {t.title}\n{old_price:.2f} -> {new_price:.2f}\n{link}"
+                text = f"{direction} de prix ! {t.title}\n{old_price:.2f} -> {new_price:.2f}"
+                keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("Voir le produit", url=link)]])
 
                 user = session.query(User).filter_by(id=t.user_id).first()
-                await application.bot.send_message(chat_id=user.chat_id, text=text)
+                await application.bot.send_message(
+                    chat_id=user.chat_id, text=text, reply_markup=keyboard
+                )
             else:
                 session.commit()
     finally:
