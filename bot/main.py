@@ -3,7 +3,14 @@ import os
 
 from dotenv import load_dotenv
 from telegram import Update
-from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
+from telegram.ext import (
+    Application,
+    CallbackQueryHandler,
+    CommandHandler,
+    ContextTypes,
+    MessageHandler,
+    filters,
+)
 
 import handlers
 from db import Base, engine
@@ -59,6 +66,7 @@ def main() -> None:
         CallbackQueryHandler(handlers.on_untrack_button, pattern=r"^untrack:\d+$")
     )
     application.add_handler(CallbackQueryHandler(handlers.on_help_button, pattern=r"^help$"))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handlers.on_text))
     application.add_error_handler(on_error)
 
     application.run_polling()

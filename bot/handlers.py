@@ -17,6 +17,8 @@ from scraper import ScrapeError, fetch_product
 
 logger = logging.getLogger(__name__)
 
+WELCOME_TEXT = "Salut ! Utilise les boutons ci-dessous 👇"
+
 HELP_TEXT = (
     "Salut ! Je surveille des prix Amazon.\n\n"
     "/track <url> - suivre un produit\n"
@@ -60,28 +62,22 @@ def _get_or_create_user(session, update: Update) -> User:
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    context.user_data.pop("awaiting_url", None)
     session = SessionLocal()
     try:
         _get_or_create_user(session, update)
     finally:
         session.close()
 
-    await update.message.reply_text(HELP_TEXT, reply_markup=MAIN_KEYBOARD)
+    await update.message.reply_text(WELCOME_TEXT, reply_markup=MAIN_KEYBOARD)
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await start(update, context)
+    context.user_data.pop("awaiting_url", None)
+    await update.message.reply_text(HELP_TEXT, reply_markup=MAIN_KEYBOARD)
 
 
-async def track(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if not context.args:
-        await update.message.reply_text(
-            "Usage : /track <url_amazon>", reply_markup=_with_help_button()
-        )
-        return
-
-    url = context.args[0]
-
+async def _track_url(update: Update, context: ContextTypes.DEFAULT_TYPE, url: str) -> None:
     await update.message.reply_text("Récupération du prix en cours...")
 
     try:
@@ -115,7 +111,27 @@ async def track(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(msg, reply_markup=_product_keyboard(item_id, link))
 
 
+async def track(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if not context.args:
+        context.user_data["awaiting_url"] = True
+        await update.message.reply_text(
+            "📋 Colle le lien du produit Amazon à suivre ci-dessous.",
+            reply_markup=_with_help_button(),
+        )
+        return
+
+    context.user_data.pop("awaiting_url", None)
+    await _track_url(update, context, context.args[0])
+
+
+async def on_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if not context.user_data.pop("awaiting_url", False):
+        return
+    await _track_url(update, context, update.message.text.strip())
+
+
 async def list_tracks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    context.user_data.pop("awaiting_url", None)
     session = SessionLocal()
     try:
         user = _get_or_create_user(session, update)
@@ -151,6 +167,7 @@ def _delete_track(session, user: User, track_id: int) -> str | None:
 
 
 async def untrack(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    context.user_data.pop("awaiting_url", None)
     if not context.args:
         await update.message.reply_text(
             "Usage : /untrack <id>", reply_markup=_with_help_button()
