@@ -14,6 +14,7 @@ from scraper import ScrapeError, fetch_product
 logger = logging.getLogger(__name__)
 
 BOT_LINK = "https://t.me/amazon_pricetracker_v0_bot"
+PRIVACY_URL = "https://choncotm.com/amazon-price-tracker/policy"
 
 
 def _share_dialog_url(lang: str) -> str:
@@ -30,8 +31,11 @@ def _main_menu(lang: str) -> InlineKeyboardMarkup:
                 InlineKeyboardButton(t("menu_language", lang), callback_data="menu_language"),
                 InlineKeyboardButton(t("menu_contact", lang), callback_data="menu_contact"),
             ],
+            [
+                InlineKeyboardButton(t("menu_share", lang), callback_data="menu_share"),
+                InlineKeyboardButton(t("menu_privacy", lang), url=PRIVACY_URL),
+            ],
             [InlineKeyboardButton(t("menu_help", lang), callback_data="help")],
-            [InlineKeyboardButton(t("menu_share", lang), callback_data="menu_share")],
         ]
     )
 
