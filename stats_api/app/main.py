@@ -264,7 +264,7 @@ def stats_live():
             db.query(BotPriceHistory, BotTrack.title)
             .join(BotTrack, BotTrack.id == BotPriceHistory.track_id)
             .order_by(BotPriceHistory.checked_at.desc())
-            .limit(20)
+            .limit(10)
             .all()
         )
         recent_changes = [
