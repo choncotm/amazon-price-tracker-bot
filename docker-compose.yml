@@ -25,5 +25,22 @@ services:
       timeout: 5s
       retries: 10
 
+  stats-api:
+    build: ./stats_api
+    container_name: bot-stats-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - default
+      - bot-stats-net
+
 volumes:
   pgdata:
+
+networks:
+  bot-stats-net:
+    external: true
