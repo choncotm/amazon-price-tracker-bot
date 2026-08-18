@@ -61,7 +61,7 @@ Requires a `.env` file with the bot token and Postgres credentials.
 
 ### Stats API
 
-`stats_api/` is a small internal FastAPI service (its own container, `stats-api` in `docker-compose.yml`) that reads this project's own Postgres DB (read-only, via lightweight mirror models — never writes to the bot's own tables) and exposes aggregated stats over HTTP for the choncotm.com admin dashboard, plus monthly/yearly report generation (same schedule as choncotm.com's own site-stats reports: night of the 1st of each month, and January 1st).
+`stats_api/` is a small internal FastAPI service (its own container, `stats-api` in `docker-compose.yml`) that reads this project's own Postgres DB (read-only, via lightweight mirror models — never writes to the bot's own tables) and exposes aggregated stats (including a breakdown of users by language) over HTTP for the choncotm.com admin dashboard, plus weekly, monthly, and yearly report generation (weekly on Monday night, monthly on the night of the 1st of each month, yearly on January 1st).
 
 It's reached from choncotm.com's `stats-api` container over a shared external Docker network (`bot-stats-net`, created once with `docker network create bot-stats-net` and joined by both projects). Every request must include an `X-Internal-Token` header matching the `BOT_STATS_TOKEN` env var (same value in both projects' `.env`).
 
@@ -128,7 +128,7 @@ Nécessite un fichier `.env` avec le token du bot et les identifiants Postgres.
 
 ### API de stats
 
-`stats_api/` est un petit service FastAPI interne (son propre conteneur, `stats-api` dans `docker-compose.yml`) qui lit la base Postgres de ce projet (en lecture seule, via des modèles miroirs légers — n'écrit jamais dans les tables du bot) et expose des stats agrégées en HTTP pour le dashboard admin de choncotm.com, plus la génération de rapports mensuels/annuels (même planning que les rapports de stats du site sur choncotm.com : nuit du 1er de chaque mois, et 1er janvier).
+`stats_api/` est un petit service FastAPI interne (son propre conteneur, `stats-api` dans `docker-compose.yml`) qui lit la base Postgres de ce projet (en lecture seule, via des modèles miroirs légers — n'écrit jamais dans les tables du bot) et expose des stats agrégées (dont une répartition des utilisateurs par langue) en HTTP pour le dashboard admin de choncotm.com, plus la génération de rapports hebdomadaires, mensuels et annuels (hebdo le lundi dans la nuit, mensuel la nuit du 1er de chaque mois, annuel le 1er janvier).
 
 Il est accessible depuis le conteneur `stats-api` de choncotm.com via un réseau Docker externe partagé (`bot-stats-net`, créé une fois avec `docker network create bot-stats-net` et rejoint par les deux projets). Chaque requête doit inclure un en-tête `X-Internal-Token` correspondant à la variable d'environnement `BOT_STATS_TOKEN` (même valeur dans les `.env` des deux projets).
 

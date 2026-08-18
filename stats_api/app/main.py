@@ -32,6 +32,7 @@ class BotUser(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
+    language = Column(String(8))
     created_at = Column(DateTime)
 
 
@@ -61,8 +62,8 @@ class Report(Base):
     __table_args__ = (UniqueConstraint("period_type", "period_label"),)
 
     id = Column(Integer, primary_key=True)
-    period_type = Column(String(10), nullable=False)  # "monthly" or "yearly"
-    period_label = Column(String(20), nullable=False)  # "2026-07" or "2026"
+    period_type = Column(String(10), nullable=False)  # "weekly", "monthly" or "yearly"
+    period_label = Column(String(20), nullable=False)  # "2026-W07", "2026-07" or "2026"
     total_users = Column(Integer, nullable=False)
     new_users = Column(Integer, nullable=False)
     total_tracks = Column(Integer, nullable=False)
@@ -134,6 +135,17 @@ def generate_report(period_type: str, start: datetime, end: datetime, label: str
         db.close()
 
 
+def run_weekly_report() -> None:
+    now = datetime.now(timezone.utc)
+    this_week_start = (now - timedelta(days=now.weekday())).replace(
+        hour=0, minute=0, second=0, microsecond=0
+    )
+    prev_week_start = this_week_start - timedelta(days=7)
+    iso_year, iso_week, _ = prev_week_start.isocalendar()
+    label = f"{iso_year}-W{iso_week:02d}"
+    generate_report("weekly", prev_week_start, this_week_start, label)
+
+
 def run_monthly_report() -> None:
     now = datetime.now(timezone.utc)
     this_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -158,6 +170,7 @@ def run_yearly_report() -> None:
 
 
 scheduler = BackgroundScheduler(timezone="UTC")
+scheduler.add_job(run_weekly_report, CronTrigger(day_of_week="mon", hour=0, minute=3))
 scheduler.add_job(run_monthly_report, CronTrigger(day=1, hour=0, minute=5))
 scheduler.add_job(run_yearly_report, CronTrigger(month=1, day=1, hour=0, minute=10))
 scheduler.start()
@@ -206,6 +219,11 @@ def stats_live():
             }
             for ph, title in recent
         ]
+        languages = dict(
+            db.query(BotUser.language, func.count(BotUser.id))
+            .group_by(BotUser.language)
+            .all()
+        )
     finally:
         db.close()
 
@@ -217,6 +235,7 @@ def stats_live():
         "price_drops_30d": price_drops_30d,
         "price_rises_30d": price_rises_30d,
         "recent_changes": recent_changes,
+        "languages": languages,
     }
 
 
@@ -240,6 +259,7 @@ def stats_reports():
         }
 
     return {
+        "weekly": [serialize(r) for r in reports if r.period_type == "weekly"],
         "monthly": [serialize(r) for r in reports if r.period_type == "monthly"],
         "yearly": [serialize(r) for r in reports if r.period_type == "yearly"],
     }
