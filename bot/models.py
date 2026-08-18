@@ -44,3 +44,12 @@ class PriceHistory(Base):
     checked_at = Column(DateTime, default=datetime.utcnow)
 
     track = relationship("Track", back_populates="history")
+
+
+class FeatureUsage(Base):
+    __tablename__ = "feature_usage"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    feature = Column(String(20), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)

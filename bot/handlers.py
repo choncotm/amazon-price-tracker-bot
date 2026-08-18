@@ -8,7 +8,7 @@ from telegram.ext import ContextTypes
 from affiliate import with_affiliate_tag
 from db import SessionLocal
 from i18n import LANGUAGE_NAMES, t
-from models import PriceHistory, Track, User
+from models import FeatureUsage, PriceHistory, Track, User
 from scraper import ScrapeError, fetch_product
 
 logger = logging.getLogger(__name__)
@@ -91,8 +91,19 @@ def _get_lang(update: Update) -> str:
         session.close()
 
 
+def _log_feature(update: Update, feature: str) -> None:
+    session = SessionLocal()
+    try:
+        user = _get_or_create_user(session, update)
+        session.add(FeatureUsage(user_id=user.id, feature=feature))
+        session.commit()
+    finally:
+        session.close()
+
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data.pop("awaiting_url", None)
+    _log_feature(update, "help")
     session = SessionLocal()
     try:
         lang = _get_or_create_user(session, update).language
@@ -104,6 +115,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data.pop("awaiting_url", None)
+    _log_feature(update, "help")
     lang = _get_lang(update)
     await update.effective_message.reply_text(t("help", lang), reply_markup=_main_menu(lang), parse_mode="HTML")
 
@@ -126,6 +138,7 @@ async def on_menu_language_button(update: Update, context: ContextTypes.DEFAULT_
 
 async def contact_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data.pop("awaiting_url", None)
+    _log_feature(update, "contact")
     lang = _get_lang(update)
     await update.effective_message.reply_text(
         t("contact_text", lang), reply_markup=_with_help_button(lang)
@@ -134,6 +147,7 @@ async def contact_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
 async def on_menu_contact_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.callback_query.answer()
+    _log_feature(update, "contact")
     lang = _get_lang(update)
     await update.effective_message.reply_text(
         t("contact_text", lang), reply_markup=_with_help_button(lang)
@@ -142,6 +156,7 @@ async def on_menu_contact_button(update: Update, context: ContextTypes.DEFAULT_T
 
 async def on_menu_share_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.callback_query.answer()
+    _log_feature(update, "share")
     lang = _get_lang(update)
     keyboard = _with_help_button(
         lang, [[InlineKeyboardButton(t("share_open_button", lang), url=_share_dialog_url(lang))]]
@@ -163,6 +178,7 @@ async def on_language_button(update: Update, context: ContextTypes.DEFAULT_TYPE)
         session.commit()
     finally:
         session.close()
+    _log_feature(update, "language")
 
     await query.edit_message_text(t("language_set", lang, name=LANGUAGE_NAMES[lang]))
     await query.message.reply_text(t("help", lang), reply_markup=_main_menu(lang), parse_mode="HTML")
@@ -196,6 +212,7 @@ async def _track_url(update: Update, context: ContextTypes.DEFAULT_TYPE, url: st
         item_id = item.id
     finally:
         session.close()
+    _log_feature(update, "track")
 
     link = with_affiliate_tag(product["url"])
     msg = t("product_added", lang, id=item_id, title=product["title"], price=product["price"])
@@ -225,6 +242,7 @@ async def on_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def list_tracks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data.pop("awaiting_url", None)
+    _log_feature(update, "list")
     session = SessionLocal()
     try:
         user = _get_or_create_user(session, update)
@@ -267,6 +285,7 @@ def _delete_track(session, user: User, track_id: int) -> str | None:
 
 async def untrack(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data.pop("awaiting_url", None)
+    _log_feature(update, "untrack")
     session = SessionLocal()
     try:
         user = _get_or_create_user(session, update)
@@ -303,6 +322,7 @@ async def untrack(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def on_untrack_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
+    _log_feature(update, "untrack")
     track_id = int(query.data.split(":", 1)[1])
 
     session = SessionLocal()
@@ -330,6 +350,7 @@ async def on_untrack_button(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 async def on_help_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
+    _log_feature(update, "help")
     lang = _get_lang(update)
     await query.message.reply_text(t("help", lang), reply_markup=_main_menu(lang), parse_mode="HTML")
 
@@ -389,6 +410,7 @@ async def on_menu_history_button(update: Update, context: ContextTypes.DEFAULT_T
 async def on_history_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
+    _log_feature(update, "history")
     track_id = int(query.data.split(":", 1)[1])
 
     session = SessionLocal()

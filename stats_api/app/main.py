@@ -5,6 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from fastapi import Depends, FastAPI, Header, HTTPException
 from sqlalchemy import (
+    JSON,
     Column,
     DateTime,
     Float,
@@ -40,6 +41,7 @@ class BotTrack(Base):
     __tablename__ = "tracks"
 
     id = Column(Integer, primary_key=True)
+    url = Column(Text)
     title = Column(Text)
     last_price = Column(Float)
     currency = Column(String(8))
@@ -56,6 +58,14 @@ class BotPriceHistory(Base):
     checked_at = Column(DateTime)
 
 
+class BotFeatureUsage(Base):
+    __tablename__ = "feature_usage"
+
+    id = Column(Integer, primary_key=True)
+    feature = Column(String(20))
+    created_at = Column(DateTime)
+
+
 # Owned by this service — new table, doesn't touch the bot's own schema.
 class Report(Base):
     __tablename__ = "stats_reports"
@@ -70,6 +80,18 @@ class Report(Base):
     new_tracks = Column(Integer, nullable=False)
     price_drops = Column(Integer, nullable=False)
     price_rises = Column(Integer, nullable=False)
+    top_products = Column(JSON, nullable=False, default=list)
+    generated_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class FeatureReport(Base):
+    __tablename__ = "feature_reports"
+    __table_args__ = (UniqueConstraint("period_type", "period_label"),)
+
+    id = Column(Integer, primary_key=True)
+    period_type = Column(String(10), nullable=False)
+    period_label = Column(String(20), nullable=False)
+    features = Column(JSON, nullable=False, default=dict)
     generated_at = Column(DateTime(timezone=True), server_default=func.now())
 
 
@@ -116,6 +138,15 @@ def generate_report(period_type: str, start: datetime, end: datetime, label: str
             )
             .count()
         )
+        top_products_raw = (
+            db.query(BotTrack.url, func.max(BotTrack.title), func.count(BotTrack.id))
+            .filter(BotTrack.created_at >= start, BotTrack.created_at < end)
+            .group_by(BotTrack.url)
+            .order_by(func.count(BotTrack.id).desc())
+            .limit(10)
+            .all()
+        )
+        top_products = [[title or url, n] for url, title, n in top_products_raw]
         db.add(
             Report(
                 period_type=period_type,
@@ -126,7 +157,30 @@ def generate_report(period_type: str, start: datetime, end: datetime, label: str
                 new_tracks=new_tracks,
                 price_drops=price_drops,
                 price_rises=price_rises,
+                top_products=top_products,
             )
+        )
+        db.commit()
+    except IntegrityError:
+        db.rollback()  # report for this period already exists
+    finally:
+        db.close()
+
+
+def generate_feature_report(period_type: str, start: datetime, end: datetime, label: str) -> None:
+    db = SessionLocal()
+    try:
+        features = dict(
+            db.query(BotFeatureUsage.feature, func.count(BotFeatureUsage.id))
+            .filter(
+                BotFeatureUsage.created_at >= start,
+                BotFeatureUsage.created_at < end,
+            )
+            .group_by(BotFeatureUsage.feature)
+            .all()
+        )
+        db.add(
+            FeatureReport(period_type=period_type, period_label=label, features=features)
         )
         db.commit()
     except IntegrityError:
@@ -144,6 +198,7 @@ def run_weekly_report() -> None:
     iso_year, iso_week, _ = prev_week_start.isocalendar()
     label = f"{iso_year}-W{iso_week:02d}"
     generate_report("weekly", prev_week_start, this_week_start, label)
+    generate_feature_report("weekly", prev_week_start, this_week_start, label)
 
 
 def run_monthly_report() -> None:
@@ -157,6 +212,7 @@ def run_monthly_report() -> None:
         prev_month_start = this_month_start.replace(month=this_month_start.month - 1)
     label = prev_month_start.strftime("%Y-%m")
     generate_report("monthly", prev_month_start, this_month_start, label)
+    generate_feature_report("monthly", prev_month_start, this_month_start, label)
 
 
 def run_yearly_report() -> None:
@@ -167,6 +223,7 @@ def run_yearly_report() -> None:
     prev_year_start = this_year_start.replace(year=this_year_start.year - 1)
     label = str(prev_year_start.year)
     generate_report("yearly", prev_year_start, this_year_start, label)
+    generate_feature_report("yearly", prev_year_start, this_year_start, label)
 
 
 scheduler = BackgroundScheduler(timezone="UTC")
@@ -224,6 +281,12 @@ def stats_live():
             .group_by(BotUser.language)
             .all()
         )
+        features_30d = dict(
+            db.query(BotFeatureUsage.feature, func.count(BotFeatureUsage.id))
+            .filter(BotFeatureUsage.created_at >= since)
+            .group_by(BotFeatureUsage.feature)
+            .all()
+        )
     finally:
         db.close()
 
@@ -236,6 +299,7 @@ def stats_live():
         "price_rises_30d": price_rises_30d,
         "recent_changes": recent_changes,
         "languages": languages,
+        "features_30d": features_30d,
     }
 
 
@@ -244,6 +308,9 @@ def stats_reports():
     db = SessionLocal()
     try:
         reports = db.query(Report).order_by(Report.period_label.desc()).all()
+        feature_reports = (
+            db.query(FeatureReport).order_by(FeatureReport.period_label.desc()).all()
+        )
     finally:
         db.close()
 
@@ -256,10 +323,25 @@ def stats_reports():
             "new_tracks": r.new_tracks,
             "price_drops": r.price_drops,
             "price_rises": r.price_rises,
+            "top_products": r.top_products,
         }
+
+    def serialize_features(r: FeatureReport) -> dict:
+        return {"period_label": r.period_label, "features": r.features}
 
     return {
         "weekly": [serialize(r) for r in reports if r.period_type == "weekly"],
         "monthly": [serialize(r) for r in reports if r.period_type == "monthly"],
         "yearly": [serialize(r) for r in reports if r.period_type == "yearly"],
+        "feature_reports": {
+            "weekly": [
+                serialize_features(r) for r in feature_reports if r.period_type == "weekly"
+            ],
+            "monthly": [
+                serialize_features(r) for r in feature_reports if r.period_type == "monthly"
+            ],
+            "yearly": [
+                serialize_features(r) for r in feature_reports if r.period_type == "yearly"
+            ],
+        },
     }
