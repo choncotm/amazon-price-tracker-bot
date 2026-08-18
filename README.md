@@ -44,6 +44,7 @@ Runs on an OVH VPS, alongside my other projects (each in its own Docker containe
 - SQLAlchemy + PostgreSQL
 - APScheduler for the periodic price checks
 - Playwright for scraping Amazon product pages
+- Docker, deployed on an OVH VPS
 
 ## Running
 
