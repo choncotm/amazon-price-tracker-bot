@@ -12,6 +12,8 @@ Amazon prices fluctuate constantly, and manually re-checking whether an item you
 
 A Telegram bot: send it an Amazon product link, it tracks the price in the background and pings you on Telegram as soon as it changes.
 
+Runs on an OVH VPS, alongside my other projects (each in its own Docker container).
+
 ## How it works
 
 - Send the bot an Amazon product link to start tracking it
