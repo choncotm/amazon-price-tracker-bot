@@ -24,8 +24,7 @@ TRANSLATIONS = {
             "/language - changer de langue\n"
             "/contact - me contacter\n\n"
             "/help - afficher cette aide\n\n"
-            "<i>En tant que Partenaire Amazon, je réalise un bénéfice sur les achats "
-            "remplissant les conditions requises, sans coût supplémentaire pour vous.</i>"
+            "<i>Liens affiliés Amazon — aucun impact sur le prix pour vous.</i>"
         ),
         "menu_track": "🔍 Suivre un produit",
         "menu_list": "📋 Mes produits",
@@ -80,8 +79,7 @@ TRANSLATIONS = {
             "/language - change language\n"
             "/contact - contact me\n\n"
             "/help - show this help\n\n"
-            "<i>As an Amazon Associate I earn from qualifying purchases, at no extra "
-            "cost to you.</i>"
+            "<i>Amazon affiliate links — no impact on your price.</i>"
         ),
         "menu_track": "🔍 Track a product",
         "menu_list": "📋 My products",
@@ -136,8 +134,7 @@ TRANSLATIONS = {
             "/language - cambiar de idioma\n"
             "/contact - contactarme\n\n"
             "/help - mostrar esta ayuda\n\n"
-            "<i>Como Afiliado de Amazon, obtengo beneficios de las compras que cumplen "
-            "los requisitos aplicables, sin coste adicional para ti.</i>"
+            "<i>Enlaces de afiliado de Amazon — sin impacto en tu precio.</i>"
         ),
         "menu_track": "🔍 Seguir un producto",
         "menu_list": "📋 Mis productos",
@@ -192,8 +189,7 @@ TRANSLATIONS = {
             "/language - Sprache ändern\n"
             "/contact - Kontakt zu mir\n\n"
             "/help - diese Hilfe anzeigen\n\n"
-            "<i>Als Amazon-Partner verdiene ich an qualifizierten Verkäufen, ohne "
-            "Mehrkosten für dich.</i>"
+            "<i>Amazon-Partnerlinks — kein Einfluss auf deinen Preis.</i>"
         ),
         "menu_track": "🔍 Produkt verfolgen",
         "menu_list": "📋 Meine Produkte",
@@ -248,8 +244,7 @@ TRANSLATIONS = {
             "/language - mudar de idioma\n"
             "/contact - contactar-me\n\n"
             "/help - mostrar esta ajuda\n\n"
-            "<i>Como Associado da Amazon, tenho lucro com compras elegíveis, sem custo "
-            "extra para ti.</i>"
+            "<i>Links de afiliado da Amazon — sem impacto no teu preço.</i>"
         ),
         "menu_track": "🔍 Seguir um produto",
         "menu_list": "📋 Os meus produtos",
@@ -304,8 +299,7 @@ TRANSLATIONS = {
             "/language - сменить язык\n"
             "/contact - связаться со мной\n\n"
             "/help - показать эту справку\n\n"
-            "<i>Как партнёр Amazon, я получаю вознаграждение с покупок, соответствующих "
-            "условиям программы, без дополнительных затрат для вас.</i>"
+            "<i>Партнёрские ссылки Amazon — без влияния на цену для вас.</i>"
         ),
         "menu_track": "🔍 Отслеживать товар",
         "menu_list": "📋 Мои товары",
