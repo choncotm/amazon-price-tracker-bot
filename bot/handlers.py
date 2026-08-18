@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from datetime import datetime
 from urllib.parse import quote
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
@@ -96,6 +97,25 @@ def _log_feature(update: Update, feature: str) -> None:
     try:
         user = _get_or_create_user(session, update)
         session.add(FeatureUsage(user_id=user.id, feature=feature))
+        session.commit()
+    finally:
+        session.close()
+
+
+async def on_my_chat_member(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Tracks whether a user has blocked the bot (Telegram's only signal for
+    "this user is gone") — never deletes their row, just marks/unmarks it so
+    stats can exclude them once they also have nothing tracked."""
+    new_status = update.my_chat_member.new_chat_member.status
+    session = SessionLocal()
+    try:
+        user = session.query(User).filter_by(telegram_id=update.effective_user.id).first()
+        if user is None:
+            return
+        if new_status in ("kicked", "left"):
+            user.blocked_at = datetime.utcnow()
+        elif new_status == "member":
+            user.blocked_at = None
         session.commit()
     finally:
         session.close()

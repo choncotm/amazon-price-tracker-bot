@@ -14,7 +14,9 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
     create_engine,
+    exists,
     func,
+    or_,
 )
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import declarative_base, sessionmaker
@@ -35,12 +37,14 @@ class BotUser(Base):
     id = Column(Integer, primary_key=True)
     language = Column(String(8))
     created_at = Column(DateTime)
+    blocked_at = Column(DateTime)
 
 
 class BotTrack(Base):
     __tablename__ = "tracks"
 
     id = Column(Integer, primary_key=True)
+    user_id = Column(Integer)
     url = Column(Text)
     title = Column(Text)
     last_price = Column(Float)
@@ -64,6 +68,13 @@ class BotFeatureUsage(Base):
     id = Column(Integer, primary_key=True)
     feature = Column(String(20))
     created_at = Column(DateTime)
+
+
+def _active_user_filter():
+    """A user counts toward the stats unless they've blocked the bot AND have
+    nothing left tracked — kept in the DB either way, just excluded here."""
+    has_tracks = exists().where(BotTrack.user_id == BotUser.id)
+    return or_(BotUser.blocked_at.is_(None), has_tracks)
 
 
 # Owned by this service — new table, doesn't touch the bot's own schema.
@@ -108,10 +119,14 @@ def require_token(x_internal_token: str = Header(None)) -> None:
 def generate_report(period_type: str, start: datetime, end: datetime, label: str) -> None:
     db = SessionLocal()
     try:
-        total_users = db.query(BotUser).filter(BotUser.created_at < end).count()
+        total_users = (
+            db.query(BotUser)
+            .filter(BotUser.created_at < end, _active_user_filter())
+            .count()
+        )
         new_users = (
             db.query(BotUser)
-            .filter(BotUser.created_at >= start, BotUser.created_at < end)
+            .filter(BotUser.created_at >= start, BotUser.created_at < end, _active_user_filter())
             .count()
         )
         total_tracks = db.query(BotTrack).filter(BotTrack.created_at < end).count()
@@ -238,8 +253,12 @@ def stats_live():
     since = datetime.now(timezone.utc) - timedelta(days=30)
     db = SessionLocal()
     try:
-        total_users = db.query(BotUser).count()
-        new_users_30d = db.query(BotUser).filter(BotUser.created_at >= since).count()
+        total_users = db.query(BotUser).filter(_active_user_filter()).count()
+        new_users_30d = (
+            db.query(BotUser)
+            .filter(BotUser.created_at >= since, _active_user_filter())
+            .count()
+        )
         total_tracks = db.query(BotTrack).count()
         new_tracks_30d = (
             db.query(BotTrack).filter(BotTrack.created_at >= since).count()
@@ -278,6 +297,7 @@ def stats_live():
         ]
         languages = dict(
             db.query(BotUser.language, func.count(BotUser.id))
+            .filter(_active_user_filter())
             .group_by(BotUser.language)
             .all()
         )

@@ -14,6 +14,7 @@ class User(Base):
     chat_id = Column(BigInteger, nullable=False)
     language = Column(String(8), nullable=False, default="fr")
     created_at = Column(DateTime, default=datetime.utcnow)
+    blocked_at = Column(DateTime, nullable=True)
 
     tracks = relationship("Track", back_populates="user", cascade="all, delete-orphan")
 
