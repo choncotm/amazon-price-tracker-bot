@@ -202,34 +202,34 @@ def run_weekly_report() -> None:
 
 
 def run_monthly_report() -> None:
+    # Runs on the last day of the month, so "this month" is the period being closed out.
     now = datetime.now(timezone.utc)
     this_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    if this_month_start.month == 1:
-        prev_month_start = this_month_start.replace(
-            year=this_month_start.year - 1, month=12
-        )
+    if this_month_start.month == 12:
+        next_month_start = this_month_start.replace(year=this_month_start.year + 1, month=1)
     else:
-        prev_month_start = this_month_start.replace(month=this_month_start.month - 1)
-    label = prev_month_start.strftime("%Y-%m")
-    generate_report("monthly", prev_month_start, this_month_start, label)
-    generate_feature_report("monthly", prev_month_start, this_month_start, label)
+        next_month_start = this_month_start.replace(month=this_month_start.month + 1)
+    label = this_month_start.strftime("%Y-%m")
+    generate_report("monthly", this_month_start, next_month_start, label)
+    generate_feature_report("monthly", this_month_start, next_month_start, label)
 
 
 def run_yearly_report() -> None:
+    # Runs on the last day of the year (Dec 31), so "this year" is the period being closed out.
     now = datetime.now(timezone.utc)
     this_year_start = now.replace(
         month=1, day=1, hour=0, minute=0, second=0, microsecond=0
     )
-    prev_year_start = this_year_start.replace(year=this_year_start.year - 1)
-    label = str(prev_year_start.year)
-    generate_report("yearly", prev_year_start, this_year_start, label)
-    generate_feature_report("yearly", prev_year_start, this_year_start, label)
+    next_year_start = this_year_start.replace(year=this_year_start.year + 1)
+    label = str(this_year_start.year)
+    generate_report("yearly", this_year_start, next_year_start, label)
+    generate_feature_report("yearly", this_year_start, next_year_start, label)
 
 
 scheduler = BackgroundScheduler(timezone="UTC")
 scheduler.add_job(run_weekly_report, CronTrigger(day_of_week="mon", hour=0, minute=3))
-scheduler.add_job(run_monthly_report, CronTrigger(day=1, hour=0, minute=5))
-scheduler.add_job(run_yearly_report, CronTrigger(month=1, day=1, hour=0, minute=10))
+scheduler.add_job(run_monthly_report, CronTrigger(day="last", hour=23, minute=50))
+scheduler.add_job(run_yearly_report, CronTrigger(month=12, day=31, hour=23, minute=55))
 scheduler.start()
 
 
