@@ -12,9 +12,10 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     telegram_id = Column(BigInteger, unique=True, nullable=False)
     chat_id = Column(BigInteger, nullable=False)
-    language = Column(String(8), nullable=False, default="fr")
+    language = Column(String(8), nullable=False, default="en")
     created_at = Column(DateTime, default=datetime.utcnow)
     blocked_at = Column(DateTime, nullable=True)
+    referred_by_id = Column(Integer, ForeignKey("users.id"), nullable=True)
 
     tracks = relationship("Track", back_populates="user", cascade="all, delete-orphan")
 

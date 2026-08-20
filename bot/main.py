@@ -2,6 +2,7 @@ import logging
 import os
 
 from dotenv import load_dotenv
+from sqlalchemy import text
 from telegram import BotCommand, Update
 from telegram.ext import (
     Application,
@@ -37,7 +38,6 @@ async def post_init(application: Application) -> None:
             BotCommand("untrack", "Arrêter de suivre un produit"),
             BotCommand("history", "Historique des prix d'un produit"),
             BotCommand("language", "Changer de langue"),
-            BotCommand("contact", "Me contacter"),
             BotCommand("help", "Afficher l'aide"),
         ]
     )
@@ -50,7 +50,7 @@ async def post_init(application: Application) -> None:
 async def on_error(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
     logger.exception("Unhandled error while processing update", exc_info=context.error)
     if isinstance(update, Update) and update.effective_message:
-        lang = "fr"
+        lang = "en"
         if update.effective_user:
             session = SessionLocal()
             try:
@@ -69,8 +69,22 @@ async def on_error(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
             logger.exception("Failed to notify user about the error")
 
 
+def _migrate(engine) -> None:
+    """Adds columns introduced after the initial schema. create_all() only
+    creates missing tables, never alters existing ones, so this covers the gap
+    for a project without a migration tool."""
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS "
+                "referred_by_id INTEGER REFERENCES users(id)"
+            )
+        )
+
+
 def main() -> None:
     Base.metadata.create_all(engine)
+    _migrate(engine)
 
     token = os.environ["TELEGRAM_BOT_TOKEN"]
     application = (
@@ -91,7 +105,6 @@ def main() -> None:
     application.add_handler(CommandHandler("untrack", handlers.untrack))
     application.add_handler(CommandHandler("history", handlers.history_command))
     application.add_handler(CommandHandler("language", handlers.language_command))
-    application.add_handler(CommandHandler("contact", handlers.contact_command))
     application.add_handler(
         CallbackQueryHandler(handlers.on_untrack_button, pattern=r"^untrack:\d+$")
     )
@@ -110,9 +123,6 @@ def main() -> None:
     )
     application.add_handler(
         CallbackQueryHandler(handlers.on_menu_language_button, pattern=r"^menu_language$")
-    )
-    application.add_handler(
-        CallbackQueryHandler(handlers.on_menu_contact_button, pattern=r"^menu_contact$")
     )
     application.add_handler(
         CallbackQueryHandler(handlers.on_menu_share_button, pattern=r"^menu_share$")

@@ -60,7 +60,7 @@ async def check_prices(application: Application) -> None:
                             t("delete_product", lang), callback_data=f"untrack:{track_item.id}"
                         )
                     ],
-                    [InlineKeyboardButton(t("menu_help", lang), callback_data="help")],
+                    [InlineKeyboardButton(t("back_button", lang), callback_data="help")],
                 ]
             )
 

@@ -1,7 +1,8 @@
 import asyncio
 import logging
+import re
 from datetime import datetime
-from urllib.parse import quote
+from urllib.parse import quote, urlsplit
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
@@ -10,16 +11,33 @@ from affiliate import with_affiliate_tag
 from db import SessionLocal
 from i18n import LANGUAGE_NAMES, t
 from models import FeatureUsage, PriceHistory, Track, User
+from referral import referral_link, track_limit
 from scraper import ScrapeError, fetch_product
 
 logger = logging.getLogger(__name__)
 
-BOT_LINK = "https://t.me/amazon_pricetracker_v0_bot"
-PRIVACY_URL = "https://choncotm.com/amazon-price-tracker/policy"
+# TODO(noah): replace with the real Telegram channel (demo video + support @).
+HOWITWORKS_URL = "https://t.me/REPLACE_ME_channel"
+# TODO: replace with the published telegra.ph disclaimer URL.
+PRIVACY_URL = "https://telegra.ph/REPLACE_ME"
+
+_URL_RE = re.compile(r"https?://\S+")
+_AMAZON_HOSTS = ("amazon.", "amzn.to", "amzn.eu")
 
 
-def _share_dialog_url(lang: str) -> str:
-    return f"https://t.me/share/url?url={quote(BOT_LINK)}&text={quote(t('share_caption', lang))}"
+def _extract_amazon_url(text_message: str) -> str | None:
+    match = _URL_RE.search(text_message)
+    if not match:
+        return None
+    url = match.group(0)
+    host = urlsplit(url).netloc.lower()
+    if any(h in host for h in _AMAZON_HOSTS):
+        return url
+    return None
+
+
+def _share_dialog_url(lang: str, link: str) -> str:
+    return f"https://t.me/share/url?url={quote(link)}&text={quote(t('share_caption', lang))}"
 
 
 def _main_menu(lang: str) -> InlineKeyboardMarkup:
@@ -30,32 +48,31 @@ def _main_menu(lang: str) -> InlineKeyboardMarkup:
             [InlineKeyboardButton(t("menu_history", lang), callback_data="menu_history")],
             [
                 InlineKeyboardButton(t("menu_language", lang), callback_data="menu_language"),
-                InlineKeyboardButton(t("menu_contact", lang), callback_data="menu_contact"),
+                InlineKeyboardButton(t("menu_howitworks", lang), url=HOWITWORKS_URL),
             ],
             [
                 InlineKeyboardButton(t("menu_share", lang), callback_data="menu_share"),
                 InlineKeyboardButton(t("menu_privacy", lang), url=PRIVACY_URL),
             ],
-            [InlineKeyboardButton(t("menu_help", lang), callback_data="help")],
         ]
     )
 
 
-def _with_help_button(lang: str, rows: list | None = None) -> InlineKeyboardMarkup:
+def _with_back_button(lang: str, rows: list | None = None) -> InlineKeyboardMarkup:
     rows = list(rows or [])
-    rows.append([InlineKeyboardButton(t("menu_help", lang), callback_data="help")])
+    rows.append([InlineKeyboardButton(t("back_button", lang), callback_data="help")])
     return InlineKeyboardMarkup(rows)
 
 
 def _product_keyboard(
-    lang: str, track_id: int, link: str, include_help: bool = True
+    lang: str, track_id: int, link: str, include_back: bool = True
 ) -> InlineKeyboardMarkup:
     rows = [
         [InlineKeyboardButton(t("view_product", lang), url=link)],
         [InlineKeyboardButton(t("history_button", lang), callback_data=f"history:{track_id}")],
         [InlineKeyboardButton(t("delete_product", lang), callback_data=f"untrack:{track_id}")],
     ]
-    return _with_help_button(lang, rows) if include_help else InlineKeyboardMarkup(rows)
+    return _with_back_button(lang, rows) if include_back else InlineKeyboardMarkup(rows)
 
 
 def _language_keyboard() -> InlineKeyboardMarkup:
@@ -73,15 +90,29 @@ async def _send_product(
         await update.effective_message.reply_text(text, reply_markup=keyboard)
 
 
-def _get_or_create_user(session, update: Update) -> User:
+def _get_or_create_user(session, update: Update, referral_payload: str | None = None) -> User:
     telegram_id = update.effective_user.id
     chat_id = update.effective_chat.id
     user = session.query(User).filter_by(telegram_id=telegram_id).first()
     if user is None:
-        user = User(telegram_id=telegram_id, chat_id=chat_id)
+        referred_by_id = None
+        if referral_payload:
+            try:
+                ref_telegram_id = int(referral_payload)
+            except ValueError:
+                ref_telegram_id = None
+            if ref_telegram_id and ref_telegram_id != telegram_id:
+                referrer = session.query(User).filter_by(telegram_id=ref_telegram_id).first()
+                if referrer:
+                    referred_by_id = referrer.id
+        user = User(telegram_id=telegram_id, chat_id=chat_id, referred_by_id=referred_by_id)
         session.add(user)
         session.commit()
     return user
+
+
+def _referral_count(session, user: User) -> int:
+    return session.query(User).filter_by(referred_by_id=user.id).count()
 
 
 def _get_lang(update: Update) -> str:
@@ -124,9 +155,10 @@ async def on_my_chat_member(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data.pop("awaiting_url", None)
     _log_feature(update, "help")
+    referral_payload = context.args[0] if context.args else None
     session = SessionLocal()
     try:
-        lang = _get_or_create_user(session, update).language
+        lang = _get_or_create_user(session, update, referral_payload).language
     finally:
         session.close()
 
@@ -156,32 +188,25 @@ async def on_menu_language_button(update: Update, context: ContextTypes.DEFAULT_
     )
 
 
-async def contact_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    context.user_data.pop("awaiting_url", None)
-    _log_feature(update, "contact")
-    lang = _get_lang(update)
-    await update.effective_message.reply_text(
-        t("contact_text", lang), reply_markup=_with_help_button(lang)
-    )
-
-
-async def on_menu_contact_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.callback_query.answer()
-    _log_feature(update, "contact")
-    lang = _get_lang(update)
-    await update.effective_message.reply_text(
-        t("contact_text", lang), reply_markup=_with_help_button(lang)
-    )
-
-
 async def on_menu_share_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.callback_query.answer()
     _log_feature(update, "share")
-    lang = _get_lang(update)
-    keyboard = _with_help_button(
-        lang, [[InlineKeyboardButton(t("share_open_button", lang), url=_share_dialog_url(lang))]]
+    session = SessionLocal()
+    try:
+        user = _get_or_create_user(session, update)
+        lang = user.language
+        count = _referral_count(session, user)
+        link = referral_link(user.telegram_id)
+    finally:
+        session.close()
+
+    keyboard = _with_back_button(
+        lang,
+        [[InlineKeyboardButton(t("share_open_button", lang), url=_share_dialog_url(lang, link))]],
     )
-    await update.effective_message.reply_text(t("share_message", lang), reply_markup=keyboard)
+    await update.effective_message.reply_text(
+        t("share_message", lang, count=count, link=link), reply_markup=keyboard
+    )
 
 
 async def on_language_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -205,6 +230,27 @@ async def on_language_button(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
 
 async def _track_url(update: Update, context: ContextTypes.DEFAULT_TYPE, url: str, lang: str) -> None:
+    session = SessionLocal()
+    try:
+        user = _get_or_create_user(session, update)
+        telegram_id = user.telegram_id
+        current_count = session.query(Track).filter_by(user_id=user.id).count()
+        limit = track_limit(_referral_count(session, user))
+    finally:
+        session.close()
+
+    if limit is not None and current_count >= limit:
+        link = referral_link(telegram_id)
+        keyboard = _with_back_button(
+            lang,
+            [[InlineKeyboardButton(t("share_open_button", lang), url=_share_dialog_url(lang, link))]],
+        )
+        await update.effective_message.reply_text(
+            t("limit_reached", lang, limit=limit, link=link),
+            reply_markup=keyboard,
+        )
+        return
+
     await update.effective_message.reply_text(t("fetching", lang))
 
     try:
@@ -212,7 +258,7 @@ async def _track_url(update: Update, context: ContextTypes.DEFAULT_TYPE, url: st
     except (ScrapeError, Exception) as exc:
         logger.warning("Scrape failed for %s: %s", url, exc)
         await update.effective_message.reply_text(
-            t("scrape_failed", lang), reply_markup=_with_help_button(lang)
+            t("scrape_failed", lang), reply_markup=_with_back_button(lang)
         )
         return
 
@@ -245,7 +291,7 @@ async def track(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not context.args:
         context.user_data["awaiting_url"] = True
         await update.effective_message.reply_text(
-            t("ask_link", lang), reply_markup=_with_help_button(lang)
+            t("ask_link", lang), reply_markup=_with_back_button(lang)
         )
         return
 
@@ -254,10 +300,17 @@ async def track(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def on_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if not context.user_data.pop("awaiting_url", False):
+    text_message = update.message.text.strip()
+
+    if context.user_data.pop("awaiting_url", False):
+        lang = _get_lang(update)
+        await _track_url(update, context, text_message, lang)
         return
-    lang = _get_lang(update)
-    await _track_url(update, context, update.message.text.strip(), lang)
+
+    url = _extract_amazon_url(text_message)
+    if url:
+        lang = _get_lang(update)
+        await _track_url(update, context, url, lang)
 
 
 async def list_tracks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -270,7 +323,7 @@ async def list_tracks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         tracks = session.query(Track).filter_by(user_id=user.id).all()
         if not tracks:
             await update.effective_message.reply_text(
-                t("list_empty", lang), reply_markup=_with_help_button(lang)
+                t("list_empty", lang), reply_markup=_with_back_button(lang)
             )
             return
 
@@ -283,12 +336,8 @@ async def list_tracks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
                 price=track_item.last_price,
             )
             link = with_affiliate_tag(track_item.url)
-            keyboard = _product_keyboard(lang, track_item.id, link, include_help=False)
+            keyboard = _product_keyboard(lang, track_item.id, link, include_back=False)
             await _send_product(update, text, keyboard, track_item.image_url)
-
-        await update.effective_message.reply_text(
-            t("list_end", lang), reply_markup=_with_help_button(lang)
-        )
     finally:
         session.close()
 
@@ -313,7 +362,7 @@ async def untrack(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
         if not context.args:
             await update.effective_message.reply_text(
-                t("untrack_usage", lang), reply_markup=_with_help_button(lang)
+                t("untrack_usage", lang), reply_markup=_with_back_button(lang)
             )
             return
 
@@ -321,21 +370,21 @@ async def untrack(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             track_id = int(context.args[0])
         except ValueError:
             await update.effective_message.reply_text(
-                t("untrack_invalid_id", lang), reply_markup=_with_help_button(lang)
+                t("untrack_invalid_id", lang), reply_markup=_with_back_button(lang)
             )
             return
 
         title = _delete_track(session, user, track_id)
         if title is None:
             await update.effective_message.reply_text(
-                t("untrack_not_found", lang), reply_markup=_with_help_button(lang)
+                t("untrack_not_found", lang), reply_markup=_with_back_button(lang)
             )
             return
     finally:
         session.close()
 
     await update.effective_message.reply_text(
-        t("untrack_success", lang, id=track_id), reply_markup=_with_help_button(lang)
+        t("untrack_success", lang, id=track_id), reply_markup=_with_back_button(lang)
     )
 
 
@@ -364,7 +413,7 @@ async def on_untrack_button(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     else:
         text = t("untrack_success_button", lang, id=track_id, title=title)
 
-    await context.bot.send_message(chat_id=chat_id, text=text, reply_markup=_with_help_button(lang))
+    await context.bot.send_message(chat_id=chat_id, text=text, reply_markup=_with_back_button(lang))
 
 
 async def on_help_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -380,7 +429,7 @@ async def on_menu_track_button(update: Update, context: ContextTypes.DEFAULT_TYP
     lang = _get_lang(update)
     context.user_data["awaiting_url"] = True
     await update.effective_message.reply_text(
-        t("ask_link", lang), reply_markup=_with_help_button(lang)
+        t("ask_link", lang), reply_markup=_with_back_button(lang)
     )
 
 
@@ -400,7 +449,7 @@ async def _show_history_menu(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     if not tracks:
         await update.effective_message.reply_text(
-            t("list_empty", lang), reply_markup=_with_help_button(lang)
+            t("list_empty", lang), reply_markup=_with_back_button(lang)
         )
         return
 
@@ -413,7 +462,7 @@ async def _show_history_menu(update: Update, context: ContextTypes.DEFAULT_TYPE)
         for track_item in tracks
     ]
     await update.effective_message.reply_text(
-        t("choose_product_history", lang), reply_markup=_with_help_button(lang, rows)
+        t("choose_product_history", lang), reply_markup=_with_back_button(lang, rows)
     )
 
 
@@ -440,7 +489,7 @@ async def on_history_button(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         track_item = session.query(Track).filter_by(id=track_id, user_id=user.id).first()
         if track_item is None:
             await query.message.reply_text(
-                t("untrack_not_found_button", lang), reply_markup=_with_help_button(lang)
+                t("untrack_not_found_button", lang), reply_markup=_with_back_button(lang)
             )
             return
 
@@ -473,4 +522,4 @@ async def on_history_button(update: Update, context: ContextTypes.DEFAULT_TYPE) 
             )
         text = "\n".join(lines)
 
-    await query.message.reply_text(text, reply_markup=_with_help_button(lang))
+    await query.message.reply_text(text, reply_markup=_with_back_button(lang))

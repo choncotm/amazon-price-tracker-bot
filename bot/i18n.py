@@ -1,4 +1,4 @@
-DEFAULT_LANG = "fr"
+DEFAULT_LANG = "en"
 
 LANGUAGE_NAMES = {
     "fr": "Français 🇫🇷",
@@ -12,26 +12,21 @@ LANGUAGE_NAMES = {
 TRANSLATIONS = {
     "fr": {
         "help": (
-            "Salut 👋 Je suis ton assistant de suivi de prix Amazon : "
-            "je surveille les produits que tu m'indiques.\n\n"
-            "Je vérifie les prix toutes les ⏱️ <b>3h</b>.\n\n"
-            "🔔 <b>Je te préviens dès qu'un prix change</b>, en gardant un historique fiable "
-            "de chaque changement.\n\n"
-            "/track &lt;url&gt; - suivre un produit\n"
-            "/list - voir mes produits suivis\n"
-            "/untrack &lt;id&gt; - arrêter de suivre un produit\n"
-            "/history - consulter l'historique d'un produit\n"
-            "/language - changer de langue\n"
-            "/contact - me contacter\n\n"
-            "/help - afficher cette aide\n\n"
+            "Salut 👋 Je suis ton assistant de suivi de prix Amazon, le plus réactif du "
+            "marché. Jamais un bon plan raté.\n\n"
+            "👉 <b>Colle un lien Amazon ici</b>, ou clique sur \"suivre un produit\" pour "
+            "démarrer.\n\n"
+            "⏱️ Surveillance 24h/24\n"
+            "🔔 Alerte instantanée au moindre changement de prix\n"
+            "📊 Historique fiable de chaque variation, pour repérer les vraies promos\n\n"
             "<i>Liens affiliés Amazon — aucun impact sur le prix pour vous.</i>"
         ),
         "menu_track": "🔍 Suivre un produit",
         "menu_list": "📋 Mes produits",
-        "menu_help": "❓ Aide",
+        "back_button": "🔙 Retour",
         "menu_language": "🌐 Langue",
         "menu_history": "📈 Historique",
-        "menu_contact": "📞 Contact",
+        "menu_howitworks": "❓ Comment ça marche",
         "menu_share": "📤 Partager",
         "menu_privacy": "🔒 Confidentialité",
         "ask_link": "📋 Colle le lien du produit Amazon à suivre ci-dessous.",
@@ -39,10 +34,9 @@ TRANSLATIONS = {
         "scrape_failed": "Je n'ai pas réussi à récupérer le prix de ce produit. Vérifie le lien.",
         "product_added": "Produit ajouté (#{id}) : {title}\n\n💰 Prix actuel : {price:.2f}",
         "view_product": "🔗 Voir sur Amazon",
-        "delete_product": "🗑 Supprimer ❌",
+        "delete_product": "❌ Supprimer",
         "history_button": "📈 Historique",
         "list_empty": "Tu ne suis aucun produit pour l'instant.",
-        "list_end": "Fin de la liste.",
         "product_line": "#{id} - {title}\n\n💰 Prix actuel : {price:.2f}",
         "untrack_usage": "Usage : /untrack <id>",
         "untrack_invalid_id": "L'id doit être un nombre.",
@@ -60,33 +54,43 @@ TRANSLATIONS = {
         "history_header": "Historique des prix — {title} :",
         "history_line": "{date} : {sign} {old_price:.2f} -> {new_price:.2f}",
         "choose_product_history": "📈 Choisis un produit pour voir son historique :",
-        "contact_text": "📞 Contact\n\nGitHub : github.com/choncotm\nSite web : choncotm.com\nEmail : choncotmexe@outlook.com",
-        "share_message": "🤖 Voici le lien de mon bot :\n\nhttps://t.me/amazon_pricetracker_v0_bot\n\nAppuie longuement sur le lien pour le copier, ou utilise le bouton ci-dessous pour le partager directement.",
+        "limit_reached": (
+            "⚠️ Limite atteinte : {limit}/{limit} produits trackés.\n\n"
+            "Pour tracker plus de produits, invite tes amis 👇\n\n"
+            "🔗 Partage ton lien : {link}\n\n"
+            "👥 1 invité : 10 produits\n"
+            "👥 3 invités : 50 produits\n"
+            "👥 10 invités : illimité ♾️"
+        ),
+        "share_message": (
+            "🤖 Voici ton lien de parrainage :\n\n{link}\n\n"
+            "👥 Tu as parrainé {count} ami(s).\n\n"
+            "🎁 1 invité : 10 produits suivis\n"
+            "🎁 3 invités : 50 produits suivis\n"
+            "🎁 10 invités : suivi illimité ♾️\n\n"
+            "Appuie longuement sur le lien pour le copier, ou utilise le bouton ci-dessous "
+            "pour le partager directement."
+        ),
         "share_open_button": "📤 Partager directement",
         "share_caption": "Suis les prix Amazon avec ce bot 🤖",
     },
     "en": {
         "help": (
-            "Hi 👋 I'm your Amazon price-tracking assistant: "
-            "I watch the products you give me.\n\n"
-            "I check prices every ⏱️ <b>3 hours</b>.\n\n"
-            "🔔 <b>I notify you as soon as a price changes</b>, keeping a reliable history "
-            "of every change.\n\n"
-            "/track &lt;url&gt; - track a product\n"
-            "/list - view your tracked products\n"
-            "/untrack &lt;id&gt; - stop tracking a product\n"
-            "/history - view a product's price history\n"
-            "/language - change language\n"
-            "/contact - contact me\n\n"
-            "/help - show this help\n\n"
+            "Hi 👋 I'm your Amazon price-tracking assistant, the most responsive on the "
+            "market. Never miss a good deal again.\n\n"
+            "👉 <b>Paste an Amazon link here</b>, or tap \"track a product\" to get "
+            "started.\n\n"
+            "⏱️ 24/7 monitoring\n"
+            "🔔 Instant alert on the smallest price change\n"
+            "📊 Reliable history of every variation, to spot the real deals\n\n"
             "<i>Amazon affiliate links — no impact on your price.</i>"
         ),
         "menu_track": "🔍 Track a product",
         "menu_list": "📋 My products",
-        "menu_help": "❓ Help",
+        "back_button": "🔙 Back",
         "menu_language": "🌐 Language",
         "menu_history": "📈 History",
-        "menu_contact": "📞 Contact",
+        "menu_howitworks": "❓ How it works",
         "menu_share": "📤 Share",
         "menu_privacy": "🔒 Privacy",
         "ask_link": "📋 Paste the Amazon product link to track below.",
@@ -94,10 +98,9 @@ TRANSLATIONS = {
         "scrape_failed": "I couldn't fetch the price for this product. Check the link.",
         "product_added": "Product added (#{id}): {title}\n\n💰 Current price: {price:.2f}",
         "view_product": "🔗 View on Amazon",
-        "delete_product": "🗑 Delete ❌",
+        "delete_product": "❌ Delete",
         "history_button": "📈 History",
         "list_empty": "You're not tracking any product yet.",
-        "list_end": "End of list.",
         "product_line": "#{id} - {title}\n\n💰 Current price: {price:.2f}",
         "untrack_usage": "Usage: /untrack <id>",
         "untrack_invalid_id": "The id must be a number.",
@@ -115,33 +118,43 @@ TRANSLATIONS = {
         "history_header": "Price history — {title}:",
         "history_line": "{date}: {sign} {old_price:.2f} -> {new_price:.2f}",
         "choose_product_history": "📈 Choose a product to see its history:",
-        "contact_text": "📞 Contact\n\nGitHub: github.com/choncotm\nWebsite: choncotm.com\nEmail: choncotmexe@outlook.com",
-        "share_message": "🤖 Here is my bot's link:\n\nhttps://t.me/amazon_pricetracker_v0_bot\n\nPress and hold the link to copy it, or use the button below to share it directly.",
+        "limit_reached": (
+            "⚠️ Limit reached: {limit}/{limit} products tracked.\n\n"
+            "To track more products, invite your friends 👇\n\n"
+            "🔗 Share your link: {link}\n\n"
+            "👥 1 invite: 10 products\n"
+            "👥 3 invites: 50 products\n"
+            "👥 10 invites: unlimited ♾️"
+        ),
+        "share_message": (
+            "🤖 Here is your referral link:\n\n{link}\n\n"
+            "👥 You've invited {count} friend(s).\n\n"
+            "🎁 1 invite: 10 tracked products\n"
+            "🎁 3 invites: 50 tracked products\n"
+            "🎁 10 invites: unlimited tracking ♾️\n\n"
+            "Press and hold the link to copy it, or use the button below to share it "
+            "directly."
+        ),
         "share_open_button": "📤 Share directly",
         "share_caption": "Track Amazon prices with this bot 🤖",
     },
     "es": {
         "help": (
-            "Hola 👋 Soy tu asistente de seguimiento de precios de Amazon: "
-            "vigilo los productos que me indiques.\n\n"
-            "Reviso los precios cada ⏱️ <b>3 horas</b>.\n\n"
-            "🔔 <b>Te aviso en cuanto cambie un precio</b>, manteniendo un historial fiable "
-            "de cada cambio.\n\n"
-            "/track &lt;url&gt; - seguir un producto\n"
-            "/list - ver tus productos seguidos\n"
-            "/untrack &lt;id&gt; - dejar de seguir un producto\n"
-            "/history - ver el historial de precios de un producto\n"
-            "/language - cambiar de idioma\n"
-            "/contact - contactarme\n\n"
-            "/help - mostrar esta ayuda\n\n"
+            "Hola 👋 Soy tu asistente de seguimiento de precios de Amazon, el más rápido "
+            "del mercado. Nunca más te pierdas una buena oferta.\n\n"
+            "👉 <b>Pega un enlace de Amazon aquí</b>, o toca \"seguir un producto\" para "
+            "empezar.\n\n"
+            "⏱️ Vigilancia 24/7\n"
+            "🔔 Alerta instantánea ante el más mínimo cambio de precio\n"
+            "📊 Historial fiable de cada variación, para detectar las ofertas reales\n\n"
             "<i>Enlaces de afiliado de Amazon — sin impacto en tu precio.</i>"
         ),
         "menu_track": "🔍 Seguir un producto",
         "menu_list": "📋 Mis productos",
-        "menu_help": "❓ Ayuda",
+        "back_button": "🔙 Volver",
         "menu_language": "🌐 Idioma",
         "menu_history": "📈 Historial",
-        "menu_contact": "📞 Contacto",
+        "menu_howitworks": "❓ Cómo funciona",
         "menu_share": "📤 Compartir",
         "menu_privacy": "🔒 Privacidad",
         "ask_link": "📋 Pega abajo el enlace del producto de Amazon a seguir.",
@@ -149,10 +162,9 @@ TRANSLATIONS = {
         "scrape_failed": "No pude obtener el precio de este producto. Revisa el enlace.",
         "product_added": "Producto añadido (#{id}): {title}\n\n💰 Precio actual: {price:.2f}",
         "view_product": "🔗 Ver en Amazon",
-        "delete_product": "🗑 Eliminar ❌",
+        "delete_product": "❌ Eliminar",
         "history_button": "📈 Historial",
         "list_empty": "Todavía no sigues ningún producto.",
-        "list_end": "Fin de la lista.",
         "product_line": "#{id} - {title}\n\n💰 Precio actual: {price:.2f}",
         "untrack_usage": "Uso: /untrack <id>",
         "untrack_invalid_id": "El id debe ser un número.",
@@ -170,33 +182,43 @@ TRANSLATIONS = {
         "history_header": "Historial de precios — {title}:",
         "history_line": "{date}: {sign} {old_price:.2f} -> {new_price:.2f}",
         "choose_product_history": "📈 Elige un producto para ver su historial:",
-        "contact_text": "📞 Contacto\n\nGitHub: github.com/choncotm\nSitio web: choncotm.com\nCorreo: choncotmexe@outlook.com",
-        "share_message": "🤖 Aquí tienes el enlace de mi bot:\n\nhttps://t.me/amazon_pricetracker_v0_bot\n\nMantén pulsado el enlace para copiarlo, o usa el botón de abajo para compartirlo directamente.",
+        "limit_reached": (
+            "⚠️ Límite alcanzado: {limit}/{limit} productos seguidos.\n\n"
+            "Para seguir más productos, invita a tus amigos 👇\n\n"
+            "🔗 Comparte tu enlace: {link}\n\n"
+            "👥 1 invitado: 10 productos\n"
+            "👥 3 invitados: 50 productos\n"
+            "👥 10 invitados: ilimitado ♾️"
+        ),
+        "share_message": (
+            "🤖 Aquí tienes tu enlace de referidos:\n\n{link}\n\n"
+            "👥 Has invitado a {count} amigo(s).\n\n"
+            "🎁 1 invitado: 10 productos seguidos\n"
+            "🎁 3 invitados: 50 productos seguidos\n"
+            "🎁 10 invitados: seguimiento ilimitado ♾️\n\n"
+            "Mantén pulsado el enlace para copiarlo, o usa el botón de abajo para "
+            "compartirlo directamente."
+        ),
         "share_open_button": "📤 Compartir directamente",
         "share_caption": "Sigue los precios de Amazon con este bot 🤖",
     },
     "de": {
         "help": (
-            "Hallo 👋 Ich bin dein Amazon-Preisverfolgungs-Assistent: "
-            "Ich beobachte die Produkte, die du mir angibst.\n\n"
-            "Ich überprüfe die Preise alle ⏱️ <b>3 Stunden</b>.\n\n"
-            "🔔 <b>Ich benachrichtige dich, sobald sich ein Preis ändert</b>, und führe dabei "
-            "einen zuverlässigen Verlauf jeder Änderung.\n\n"
-            "/track &lt;url&gt; - Produkt verfolgen\n"
-            "/list - verfolgte Produkte anzeigen\n"
-            "/untrack &lt;id&gt; - Produkt nicht mehr verfolgen\n"
-            "/history - Preisverlauf eines Produkts ansehen\n"
-            "/language - Sprache ändern\n"
-            "/contact - Kontakt zu mir\n\n"
-            "/help - diese Hilfe anzeigen\n\n"
+            "Hallo 👋 Ich bin dein Amazon-Preisverfolgungs-Assistent, der "
+            "reaktionsschnellste auf dem Markt. Verpasse nie wieder ein gutes Angebot.\n\n"
+            "👉 <b>Füge hier einen Amazon-Link ein</b>, oder tippe auf \"Produkt "
+            "verfolgen\", um zu starten.\n\n"
+            "⏱️ Überwachung rund um die Uhr\n"
+            "🔔 Sofortige Benachrichtigung bei jeder Preisänderung\n"
+            "📊 Zuverlässiger Verlauf jeder Änderung, um echte Angebote zu erkennen\n\n"
             "<i>Amazon-Partnerlinks — kein Einfluss auf deinen Preis.</i>"
         ),
         "menu_track": "🔍 Produkt verfolgen",
         "menu_list": "📋 Meine Produkte",
-        "menu_help": "❓ Hilfe",
+        "back_button": "🔙 Zurück",
         "menu_language": "🌐 Sprache",
         "menu_history": "📈 Verlauf",
-        "menu_contact": "📞 Kontakt",
+        "menu_howitworks": "❓ So funktioniert's",
         "menu_share": "📤 Teilen",
         "menu_privacy": "🔒 Datenschutz",
         "ask_link": "📋 Füge unten den Amazon-Produktlink ein, den du verfolgen möchtest.",
@@ -204,10 +226,9 @@ TRANSLATIONS = {
         "scrape_failed": "Ich konnte den Preis für dieses Produkt nicht abrufen. Überprüfe den Link.",
         "product_added": "Produkt hinzugefügt (#{id}): {title}\n\n💰 Aktueller Preis: {price:.2f}",
         "view_product": "🔗 Auf Amazon ansehen",
-        "delete_product": "🗑 Löschen ❌",
+        "delete_product": "❌ Löschen",
         "history_button": "📈 Verlauf",
         "list_empty": "Du verfolgst noch kein Produkt.",
-        "list_end": "Ende der Liste.",
         "product_line": "#{id} - {title}\n\n💰 Aktueller Preis: {price:.2f}",
         "untrack_usage": "Verwendung: /untrack <id>",
         "untrack_invalid_id": "Die ID muss eine Zahl sein.",
@@ -225,33 +246,43 @@ TRANSLATIONS = {
         "history_header": "Preisverlauf — {title}:",
         "history_line": "{date}: {sign} {old_price:.2f} -> {new_price:.2f}",
         "choose_product_history": "📈 Wähle ein Produkt, um den Verlauf zu sehen:",
-        "contact_text": "📞 Kontakt\n\nGitHub: github.com/choncotm\nWebsite: choncotm.com\nE-Mail: choncotmexe@outlook.com",
-        "share_message": "🤖 Hier ist der Link zu meinem Bot:\n\nhttps://t.me/amazon_pricetracker_v0_bot\n\nHalte den Link gedrückt, um ihn zu kopieren, oder nutze den Button unten, um ihn direkt zu teilen.",
+        "limit_reached": (
+            "⚠️ Limit erreicht: {limit}/{limit} Produkte verfolgt.\n\n"
+            "Um mehr Produkte zu verfolgen, lade deine Freunde ein 👇\n\n"
+            "🔗 Teile deinen Link: {link}\n\n"
+            "👥 1 Einladung: 10 Produkte\n"
+            "👥 3 Einladungen: 50 Produkte\n"
+            "👥 10 Einladungen: unbegrenzt ♾️"
+        ),
+        "share_message": (
+            "🤖 Hier ist dein Empfehlungslink:\n\n{link}\n\n"
+            "👥 Du hast {count} Freund(e) eingeladen.\n\n"
+            "🎁 1 Einladung: 10 verfolgte Produkte\n"
+            "🎁 3 Einladungen: 50 verfolgte Produkte\n"
+            "🎁 10 Einladungen: unbegrenztes Tracking ♾️\n\n"
+            "Halte den Link gedrückt, um ihn zu kopieren, oder nutze den Button unten, um "
+            "ihn direkt zu teilen."
+        ),
         "share_open_button": "📤 Direkt teilen",
         "share_caption": "Verfolge Amazon-Preise mit diesem Bot 🤖",
     },
     "pt": {
         "help": (
-            "Olá 👋 Sou o teu assistente de monitorização de preços da Amazon: "
-            "vigio os produtos que me indicares.\n\n"
-            "Verifico os preços a cada ⏱️ <b>3 horas</b>.\n\n"
-            "🔔 <b>Aviso-te assim que um preço mudar</b>, mantendo um histórico fiável "
-            "de cada alteração.\n\n"
-            "/track &lt;url&gt; - seguir um produto\n"
-            "/list - ver os produtos que segues\n"
-            "/untrack &lt;id&gt; - deixar de seguir um produto\n"
-            "/history - ver o histórico de preços de um produto\n"
-            "/language - mudar de idioma\n"
-            "/contact - contactar-me\n\n"
-            "/help - mostrar esta ajuda\n\n"
+            "Olá 👋 Sou o teu assistente de monitorização de preços da Amazon, o mais "
+            "rápido do mercado. Nunca mais percas uma boa promoção.\n\n"
+            "👉 <b>Cola um link da Amazon aqui</b>, ou toca em \"seguir um produto\" para "
+            "começar.\n\n"
+            "⏱️ Monitorização 24h/24\n"
+            "🔔 Alerta instantâneo à mínima alteração de preço\n"
+            "📊 Histórico fiável de cada variação, para identificar as promoções reais\n\n"
             "<i>Links de afiliado da Amazon — sem impacto no teu preço.</i>"
         ),
         "menu_track": "🔍 Seguir um produto",
         "menu_list": "📋 Os meus produtos",
-        "menu_help": "❓ Ajuda",
+        "back_button": "🔙 Voltar",
         "menu_language": "🌐 Idioma",
         "menu_history": "📈 Histórico",
-        "menu_contact": "📞 Contacto",
+        "menu_howitworks": "❓ Como funciona",
         "menu_share": "📤 Partilhar",
         "menu_privacy": "🔒 Privacidade",
         "ask_link": "📋 Cola abaixo o link do produto da Amazon a seguir.",
@@ -259,10 +290,9 @@ TRANSLATIONS = {
         "scrape_failed": "Não consegui obter o preço deste produto. Verifica o link.",
         "product_added": "Produto adicionado (#{id}): {title}\n\n💰 Preço atual: {price:.2f}",
         "view_product": "🔗 Ver na Amazon",
-        "delete_product": "🗑 Eliminar ❌",
+        "delete_product": "❌ Eliminar",
         "history_button": "📈 Histórico",
         "list_empty": "Ainda não segues nenhum produto.",
-        "list_end": "Fim da lista.",
         "product_line": "#{id} - {title}\n\n💰 Preço atual: {price:.2f}",
         "untrack_usage": "Uso: /untrack <id>",
         "untrack_invalid_id": "O id deve ser um número.",
@@ -280,33 +310,43 @@ TRANSLATIONS = {
         "history_header": "Histórico de preços — {title}:",
         "history_line": "{date}: {sign} {old_price:.2f} -> {new_price:.2f}",
         "choose_product_history": "📈 Escolhe um produto para ver o histórico:",
-        "contact_text": "📞 Contacto\n\nGitHub: github.com/choncotm\nSite: choncotm.com\nEmail: choncotmexe@outlook.com",
-        "share_message": "🤖 Aqui está o link do meu bot:\n\nhttps://t.me/amazon_pricetracker_v0_bot\n\nMantém premido o link para o copiar, ou usa o botão abaixo para o partilhar diretamente.",
+        "limit_reached": (
+            "⚠️ Limite atingido: {limit}/{limit} produtos monitorizados.\n\n"
+            "Para monitorizar mais produtos, convida os teus amigos 👇\n\n"
+            "🔗 Partilha o teu link: {link}\n\n"
+            "👥 1 convidado: 10 produtos\n"
+            "👥 3 convidados: 50 produtos\n"
+            "👥 10 convidados: ilimitado ♾️"
+        ),
+        "share_message": (
+            "🤖 Aqui está o teu link de referência:\n\n{link}\n\n"
+            "👥 Convidaste {count} amigo(s).\n\n"
+            "🎁 1 convidado: 10 produtos monitorizados\n"
+            "🎁 3 convidados: 50 produtos monitorizados\n"
+            "🎁 10 convidados: monitorização ilimitada ♾️\n\n"
+            "Mantém premido o link para o copiar, ou usa o botão abaixo para o partilhar "
+            "diretamente."
+        ),
         "share_open_button": "📤 Partilhar diretamente",
         "share_caption": "Acompanha os preços da Amazon com este bot 🤖",
     },
     "ru": {
         "help": (
-            "Привет 👋 Я твой помощник по отслеживанию цен на Amazon: "
-            "слежу за товарами, которые ты укажешь.\n\n"
-            "Проверяю цены каждые ⏱️ <b>3 часа</b>.\n\n"
-            "🔔 <b>Сообщаю, как только цена изменится</b>, ведя надёжную историю "
-            "каждого изменения.\n\n"
-            "/track &lt;url&gt; - отслеживать товар\n"
-            "/list - показать отслеживаемые товары\n"
-            "/untrack &lt;id&gt; - перестать отслеживать товар\n"
-            "/history - посмотреть историю цен товара\n"
-            "/language - сменить язык\n"
-            "/contact - связаться со мной\n\n"
-            "/help - показать эту справку\n\n"
+            "Привет 👋 Я твой помощник по отслеживанию цен на Amazon, самый быстрый на "
+            "рынке. Больше никогда не упустишь выгодное предложение.\n\n"
+            "👉 <b>Вставь сюда ссылку Amazon</b> или нажми «отслеживать товар», чтобы "
+            "начать.\n\n"
+            "⏱️ Отслеживание 24/7\n"
+            "🔔 Мгновенное уведомление при малейшем изменении цены\n"
+            "📊 Надёжная история каждого изменения, чтобы находить настоящие скидки\n\n"
             "<i>Партнёрские ссылки Amazon — без влияния на цену для вас.</i>"
         ),
         "menu_track": "🔍 Отслеживать товар",
         "menu_list": "📋 Мои товары",
-        "menu_help": "❓ Помощь",
+        "back_button": "🔙 Назад",
         "menu_language": "🌐 Язык",
         "menu_history": "📈 История",
-        "menu_contact": "📞 Контакты",
+        "menu_howitworks": "❓ Как это работает",
         "menu_share": "📤 Поделиться",
         "menu_privacy": "🔒 Конфиденциальность",
         "ask_link": "📋 Вставь ссылку на товар Amazon, который нужно отслеживать.",
@@ -314,10 +354,9 @@ TRANSLATIONS = {
         "scrape_failed": "Не удалось получить цену этого товара. Проверь ссылку.",
         "product_added": "Товар добавлен (#{id}): {title}\n\n💰 Текущая цена: {price:.2f}",
         "view_product": "🔗 Смотреть на Amazon",
-        "delete_product": "🗑 Удалить ❌",
+        "delete_product": "❌ Удалить",
         "history_button": "📈 История",
         "list_empty": "Ты пока не отслеживаешь ни одного товара.",
-        "list_end": "Конец списка.",
         "product_line": "#{id} - {title}\n\n💰 Текущая цена: {price:.2f}",
         "untrack_usage": "Использование: /untrack <id>",
         "untrack_invalid_id": "ID должен быть числом.",
@@ -335,8 +374,23 @@ TRANSLATIONS = {
         "history_header": "История цен — {title}:",
         "history_line": "{date}: {sign} {old_price:.2f} -> {new_price:.2f}",
         "choose_product_history": "📈 Выбери товар, чтобы посмотреть историю:",
-        "contact_text": "📞 Контакты\n\nGitHub: github.com/choncotm\nСайт: choncotm.com\nEmail: choncotmexe@outlook.com",
-        "share_message": "🤖 Вот ссылка на мой бот:\n\nhttps://t.me/amazon_pricetracker_v0_bot\n\nЗажми ссылку, чтобы скопировать её, или используй кнопку ниже, чтобы поделиться напрямую.",
+        "limit_reached": (
+            "⚠️ Достигнут лимит: {limit}/{limit} отслеживаемых товаров.\n\n"
+            "Чтобы отслеживать больше товаров, пригласи друзей 👇\n\n"
+            "🔗 Поделись своей ссылкой: {link}\n\n"
+            "👥 1 приглашение: 10 товаров\n"
+            "👥 3 приглашения: 50 товаров\n"
+            "👥 10 приглашений: без ограничений ♾️"
+        ),
+        "share_message": (
+            "🤖 Вот твоя реферальная ссылка:\n\n{link}\n\n"
+            "👥 Ты пригласил(а) {count} друзей.\n\n"
+            "🎁 1 приглашение: 10 отслеживаемых товаров\n"
+            "🎁 3 приглашения: 50 отслеживаемых товаров\n"
+            "🎁 10 приглашений: безлимитное отслеживание ♾️\n\n"
+            "Зажми ссылку, чтобы скопировать её, или используй кнопку ниже, чтобы "
+            "поделиться напрямую."
+        ),
         "share_open_button": "📤 Поделиться напрямую",
         "share_caption": "Отслеживай цены на Amazon с этим ботом 🤖",
     },
