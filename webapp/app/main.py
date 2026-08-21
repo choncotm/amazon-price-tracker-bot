@@ -128,7 +128,7 @@ def require_user(request: Request, db: Session = Depends(get_db)) -> User:
 app = FastAPI()
 
 
-@app.post("/api/auth/telegram")
+@app.post("/auth/telegram")
 def auth_telegram(response: Response, payload: dict = Body(...), db: Session = Depends(get_db)):
     telegram_id = verify_telegram_auth(payload)
 
@@ -152,18 +152,18 @@ def auth_telegram(response: Response, payload: dict = Body(...), db: Session = D
     return {"ok": True, "language": user.language}
 
 
-@app.post("/api/logout")
+@app.post("/logout")
 def logout(response: Response):
     response.delete_cookie(COOKIE_NAME)
     return {"ok": True}
 
 
-@app.get("/api/me")
+@app.get("/me")
 def me(user: User = Depends(require_user)):
     return {"telegram_id": user.telegram_id, "language": user.language}
 
 
-@app.get("/api/products")
+@app.get("/products")
 def list_products(user: User = Depends(require_user), db: Session = Depends(get_db)):
     tracks = db.query(Track).filter_by(user_id=user.id).all()
     return [
@@ -179,7 +179,7 @@ def list_products(user: User = Depends(require_user), db: Session = Depends(get_
     ]
 
 
-@app.delete("/api/products/{track_id}")
+@app.delete("/products/{track_id}")
 def delete_product(track_id: int, user: User = Depends(require_user), db: Session = Depends(get_db)):
     track = db.query(Track).filter_by(id=track_id, user_id=user.id).first()
     if track is None:
@@ -189,7 +189,7 @@ def delete_product(track_id: int, user: User = Depends(require_user), db: Sessio
     return {"ok": True}
 
 
-@app.get("/api/products/{track_id}/history")
+@app.get("/products/{track_id}/history")
 def product_history(track_id: int, user: User = Depends(require_user), db: Session = Depends(get_db)):
     track = db.query(Track).filter_by(id=track_id, user_id=user.id).first()
     if track is None:
@@ -214,7 +214,7 @@ def product_history(track_id: int, user: User = Depends(require_user), db: Sessi
     }
 
 
-@app.post("/api/language")
+@app.post("/language")
 def set_language(
     payload: dict = Body(...), user: User = Depends(require_user), db: Session = Depends(get_db)
 ):
