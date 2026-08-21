@@ -21,6 +21,7 @@ PRIVACY_URL = "https://choncotm.com/amazon-price-tracker/policy/"
 WEBSITE_URL = "https://choncotm.com"
 GITHUB_URL = "https://github.com/choncotm"
 CONTACT_EMAIL = "choncotmexe@outlook.com"
+WEBAPP_URL = "https://choncotm.com/amazon-price-tracker/app/"
 
 _URL_RE = re.compile(r"https?://\S+")
 _AMAZON_HOSTS = ("amazon.", "amzn.to", "amzn.eu")
@@ -47,6 +48,7 @@ def _main_menu(lang: str) -> InlineKeyboardMarkup:
             [InlineKeyboardButton(t("menu_track", lang), callback_data="menu_track")],
             [InlineKeyboardButton(t("menu_list", lang), callback_data="menu_list")],
             [InlineKeyboardButton(t("menu_history", lang), callback_data="menu_history")],
+            [InlineKeyboardButton(t("menu_webapp", lang), url=WEBAPP_URL)],
             [
                 InlineKeyboardButton(t("menu_language", lang), callback_data="menu_language"),
                 InlineKeyboardButton(t("menu_howitworks", lang), url=HOWITWORKS_URL),
