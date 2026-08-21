@@ -30,6 +30,30 @@ logger = logging.getLogger(__name__)
 
 
 async def post_init(application: Application) -> None:
+    await application.bot.set_my_name("Amazon Price Tracker")
+    await application.bot.set_my_short_description(
+        "Tracks Amazon product prices and alerts you the moment they drop. "
+        "Free, fast, no manual checking needed."
+    )
+    await application.bot.set_my_description(
+        "Send me an Amazon product link and I'll track its price for you.\n\n"
+        "I'll notify you here the moment the price changes — no more manual "
+        "checking.\n\n"
+        "Commands: /track /list /untrack /history /language /help\n\n"
+        f"Privacy policy: {handlers.PRIVACY_URL}"
+    )
+
+    await application.bot.set_my_commands(
+        [
+            BotCommand("start", "Start the bot"),
+            BotCommand("track", "Track an Amazon product"),
+            BotCommand("list", "View your tracked products"),
+            BotCommand("untrack", "Stop tracking a product"),
+            BotCommand("history", "Price history for a product"),
+            BotCommand("language", "Change language"),
+            BotCommand("help", "Show help"),
+        ]
+    )
     await application.bot.set_my_commands(
         [
             BotCommand("start", "Démarrer le bot"),
@@ -39,7 +63,8 @@ async def post_init(application: Application) -> None:
             BotCommand("history", "Historique des prix d'un produit"),
             BotCommand("language", "Changer de langue"),
             BotCommand("help", "Afficher l'aide"),
-        ]
+        ],
+        language_code="fr",
     )
 
     interval = int(os.environ.get("CHECK_INTERVAL_MINUTES", "60"))

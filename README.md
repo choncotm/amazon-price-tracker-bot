@@ -4,7 +4,7 @@
 
 ## English
 
-Telegram bot ([@amazon_pricetracker_v0_bot](https://t.me/amazon_pricetracker_v0_bot)) that tracks the price of Amazon products and notifies you when it changes.
+Telegram bot ([@AmazonPricesTracker_bot](https://t.me/AmazonPricesTracker_bot)) that tracks the price of Amazon products and notifies you when it changes.
 
 Live on [choncotm.com](https://choncotm.com) — see the [privacy policy](https://choncotm.com/amazon-price-tracker/policy/).
 
@@ -71,7 +71,7 @@ Required env vars (added to this project's `.env`, alongside the existing ones):
 
 ## Français
 
-Bot Telegram ([@amazon_pricetracker_v0_bot](https://t.me/amazon_pricetracker_v0_bot)) qui suit le prix de produits Amazon et te prévient quand il change.
+Bot Telegram ([@AmazonPricesTracker_bot](https://t.me/AmazonPricesTracker_bot)) qui suit le prix de produits Amazon et te prévient quand il change.
 
 En ligne sur [choncotm.com](https://choncotm.com) — voir la [politique de confidentialité](https://choncotm.com/amazon-price-tracker/policy/).
 

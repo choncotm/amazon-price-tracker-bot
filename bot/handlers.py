@@ -18,8 +18,7 @@ logger = logging.getLogger(__name__)
 
 # TODO(noah): replace with the real Telegram channel (demo video + support @).
 HOWITWORKS_URL = "https://t.me/REPLACE_ME_channel"
-# TODO: replace with the published telegra.ph disclaimer URL.
-PRIVACY_URL = "https://telegra.ph/REPLACE_ME"
+PRIVACY_URL = "https://choncotm.com/amazon-price-tracker/policy/"
 
 _URL_RE = re.compile(r"https?://\S+")
 _AMAZON_HOSTS = ("amazon.", "amzn.to", "amzn.eu")
