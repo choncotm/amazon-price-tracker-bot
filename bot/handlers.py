@@ -18,6 +18,9 @@ logger = logging.getLogger(__name__)
 
 HOWITWORKS_URL = "https://t.me/amazonpricealerts_updates"
 PRIVACY_URL = "https://choncotm.com/amazon-price-tracker/policy/"
+WEBSITE_URL = "https://choncotm.com"
+GITHUB_URL = "https://github.com/choncotm"
+CONTACT_EMAIL_URL = "mailto:choncotmexe@outlook.com"
 
 _URL_RE = re.compile(r"https?://\S+")
 _AMAZON_HOSTS = ("amazon.", "amzn.to", "amzn.eu")
@@ -50,6 +53,7 @@ def _main_menu(lang: str) -> InlineKeyboardMarkup:
             ],
             [
                 InlineKeyboardButton(t("menu_share", lang), callback_data="menu_share"),
+                InlineKeyboardButton(t("menu_contact", lang), callback_data="menu_contact"),
                 InlineKeyboardButton(t("menu_privacy", lang), url=PRIVACY_URL),
             ],
         ]
@@ -205,6 +209,21 @@ async def on_menu_share_button(update: Update, context: ContextTypes.DEFAULT_TYP
     await update.effective_message.reply_text(
         t("share_message", lang, count=count, link=link), reply_markup=keyboard
     )
+
+
+async def on_menu_contact_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.callback_query.answer()
+    _log_feature(update, "contact")
+    lang = _get_lang(update)
+    keyboard = _with_back_button(
+        lang,
+        [
+            [InlineKeyboardButton(t("contact_website_button", lang), url=WEBSITE_URL)],
+            [InlineKeyboardButton(t("contact_github_button", lang), url=GITHUB_URL)],
+            [InlineKeyboardButton(t("contact_email_button", lang), url=CONTACT_EMAIL_URL)],
+        ],
+    )
+    await update.effective_message.reply_text(t("contact_message", lang), reply_markup=keyboard)
 
 
 async def on_language_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
