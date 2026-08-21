@@ -16,8 +16,7 @@ from scraper import ScrapeError, fetch_product
 
 logger = logging.getLogger(__name__)
 
-# TODO(noah): replace with the real Telegram channel (demo video + support @).
-HOWITWORKS_URL = "https://t.me/REPLACE_ME_channel"
+HOWITWORKS_URL = "https://t.me/amazonpricealerts_updates"
 PRIVACY_URL = "https://choncotm.com/amazon-price-tracker/policy/"
 
 _URL_RE = re.compile(r"https?://\S+")
