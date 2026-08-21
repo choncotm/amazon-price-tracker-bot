@@ -14,6 +14,8 @@ from telegram.ext import (
     filters,
 )
 
+from telegram.error import TelegramError
+
 import handlers
 from db import Base, SessionLocal, engine
 from i18n import t
@@ -29,43 +31,53 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-async def post_init(application: Application) -> None:
-    await application.bot.set_my_name("Amazon Price Tracker")
-    await application.bot.set_my_short_description(
-        "Tracks Amazon product prices and alerts you the moment they drop. "
-        "Free, fast, no manual checking needed."
-    )
-    await application.bot.set_my_description(
-        "Send me an Amazon product link and I'll track its price for you.\n\n"
-        "I'll notify you here the moment the price changes — no more manual "
-        "checking.\n\n"
-        "Commands: /track /list /untrack /history /language /help\n\n"
-        f"Privacy policy: {handlers.PRIVACY_URL}"
-    )
+async def _setup_bot_profile(application: Application) -> None:
+    """Cosmetic, one-time-ish setup (name/description/commands) — must never
+    prevent the bot from starting, e.g. if Telegram's flood control on these
+    profile-update methods kicks in after too many restarts."""
+    try:
+        await application.bot.set_my_name("Amazon Price Tracker")
+        await application.bot.set_my_short_description(
+            "Tracks Amazon product prices and alerts you the moment they drop. "
+            "Free, fast, no manual checking needed."
+        )
+        await application.bot.set_my_description(
+            "Send me an Amazon product link and I'll track its price for you.\n\n"
+            "I'll notify you here the moment the price changes — no more manual "
+            "checking.\n\n"
+            "Commands: /track /list /untrack /history /language /help\n\n"
+            f"Privacy policy: {handlers.PRIVACY_URL}"
+        )
 
-    await application.bot.set_my_commands(
-        [
-            BotCommand("start", "Start the bot"),
-            BotCommand("track", "Track an Amazon product"),
-            BotCommand("list", "View your tracked products"),
-            BotCommand("untrack", "Stop tracking a product"),
-            BotCommand("history", "Price history for a product"),
-            BotCommand("language", "Change language"),
-            BotCommand("help", "Show help"),
-        ]
-    )
-    await application.bot.set_my_commands(
-        [
-            BotCommand("start", "Démarrer le bot"),
-            BotCommand("track", "Suivre un produit Amazon"),
-            BotCommand("list", "Voir mes produits suivis"),
-            BotCommand("untrack", "Arrêter de suivre un produit"),
-            BotCommand("history", "Historique des prix d'un produit"),
-            BotCommand("language", "Changer de langue"),
-            BotCommand("help", "Afficher l'aide"),
-        ],
-        language_code="fr",
-    )
+        await application.bot.set_my_commands(
+            [
+                BotCommand("start", "Start the bot"),
+                BotCommand("track", "Track an Amazon product"),
+                BotCommand("list", "View your tracked products"),
+                BotCommand("untrack", "Stop tracking a product"),
+                BotCommand("history", "Price history for a product"),
+                BotCommand("language", "Change language"),
+                BotCommand("help", "Show help"),
+            ]
+        )
+        await application.bot.set_my_commands(
+            [
+                BotCommand("start", "Démarrer le bot"),
+                BotCommand("track", "Suivre un produit Amazon"),
+                BotCommand("list", "Voir mes produits suivis"),
+                BotCommand("untrack", "Arrêter de suivre un produit"),
+                BotCommand("history", "Historique des prix d'un produit"),
+                BotCommand("language", "Changer de langue"),
+                BotCommand("help", "Afficher l'aide"),
+            ],
+            language_code="fr",
+        )
+    except TelegramError:
+        logger.warning("Skipping bot profile setup (Telegram API error)", exc_info=True)
+
+
+async def post_init(application: Application) -> None:
+    await _setup_bot_profile(application)
 
     interval = int(os.environ.get("CHECK_INTERVAL_MINUTES", "60"))
     start_scheduler(application, interval)
