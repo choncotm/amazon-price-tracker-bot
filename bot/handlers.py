@@ -62,21 +62,21 @@ def _with_back_button(lang: str, rows: list | None = None) -> InlineKeyboardMark
     return InlineKeyboardMarkup(rows)
 
 
-def _product_keyboard(
-    lang: str, track_id: int, link: str, include_back: bool = True
-) -> InlineKeyboardMarkup:
+def _product_keyboard(lang: str, track_id: int, link: str) -> InlineKeyboardMarkup:
     rows = [
         [InlineKeyboardButton(t("view_product", lang), url=link)],
         [InlineKeyboardButton(t("history_button", lang), callback_data=f"history:{track_id}")],
         [InlineKeyboardButton(t("delete_product", lang), callback_data=f"untrack:{track_id}")],
     ]
-    return _with_back_button(lang, rows) if include_back else InlineKeyboardMarkup(rows)
+    return _with_back_button(lang, rows)
 
 
-def _language_keyboard() -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup(
-        [[InlineKeyboardButton(name, callback_data=f"lang:{code}")] for code, name in LANGUAGE_NAMES.items()]
-    )
+def _language_keyboard(lang: str) -> InlineKeyboardMarkup:
+    rows = [
+        [InlineKeyboardButton(name, callback_data=f"lang:{code}")]
+        for code, name in LANGUAGE_NAMES.items()
+    ]
+    return _with_back_button(lang, rows)
 
 
 async def _send_product(
@@ -174,7 +174,7 @@ async def language_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     context.user_data.pop("awaiting_url", None)
     lang = _get_lang(update)
     await update.effective_message.reply_text(
-        t("choose_language", lang), reply_markup=_language_keyboard()
+        t("choose_language", lang), reply_markup=_language_keyboard(lang)
     )
 
 
@@ -182,7 +182,7 @@ async def on_menu_language_button(update: Update, context: ContextTypes.DEFAULT_
     await update.callback_query.answer()
     lang = _get_lang(update)
     await update.effective_message.reply_text(
-        t("choose_language", lang), reply_markup=_language_keyboard()
+        t("choose_language", lang), reply_markup=_language_keyboard(lang)
     )
 
 
@@ -334,7 +334,7 @@ async def list_tracks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
                 price=track_item.last_price,
             )
             link = with_affiliate_tag(track_item.url)
-            keyboard = _product_keyboard(lang, track_item.id, link, include_back=False)
+            keyboard = _product_keyboard(lang, track_item.id, link)
             await _send_product(update, text, keyboard, track_item.image_url)
     finally:
         session.close()

@@ -18,8 +18,7 @@ TRANSLATIONS = {
             "démarrer.\n\n"
             "⏱️ Surveillance 24h/24\n"
             "🔔 Alerte instantanée au moindre changement de prix\n"
-            "📊 Historique fiable de chaque variation, pour repérer les vraies promos\n\n"
-            "<i>Liens affiliés Amazon — aucun impact sur le prix pour vous.</i>"
+            "📊 Historique fiable de chaque variation, pour repérer les vraies promos"
         ),
         "menu_track": "🔍 Suivre un produit",
         "menu_list": "📋 Mes produits",
@@ -82,8 +81,7 @@ TRANSLATIONS = {
             "started.\n\n"
             "⏱️ 24/7 monitoring\n"
             "🔔 Instant alert on the smallest price change\n"
-            "📊 Reliable history of every variation, to spot the real deals\n\n"
-            "<i>Amazon affiliate links — no impact on your price.</i>"
+            "📊 Reliable history of every variation, to spot the real deals"
         ),
         "menu_track": "🔍 Track a product",
         "menu_list": "📋 My products",
@@ -146,8 +144,7 @@ TRANSLATIONS = {
             "empezar.\n\n"
             "⏱️ Vigilancia 24/7\n"
             "🔔 Alerta instantánea ante el más mínimo cambio de precio\n"
-            "📊 Historial fiable de cada variación, para detectar las ofertas reales\n\n"
-            "<i>Enlaces de afiliado de Amazon — sin impacto en tu precio.</i>"
+            "📊 Historial fiable de cada variación, para detectar las ofertas reales"
         ),
         "menu_track": "🔍 Seguir un producto",
         "menu_list": "📋 Mis productos",
@@ -210,8 +207,7 @@ TRANSLATIONS = {
             "verfolgen\", um zu starten.\n\n"
             "⏱️ Überwachung rund um die Uhr\n"
             "🔔 Sofortige Benachrichtigung bei jeder Preisänderung\n"
-            "📊 Zuverlässiger Verlauf jeder Änderung, um echte Angebote zu erkennen\n\n"
-            "<i>Amazon-Partnerlinks — kein Einfluss auf deinen Preis.</i>"
+            "📊 Zuverlässiger Verlauf jeder Änderung, um echte Angebote zu erkennen"
         ),
         "menu_track": "🔍 Produkt verfolgen",
         "menu_list": "📋 Meine Produkte",
@@ -274,8 +270,7 @@ TRANSLATIONS = {
             "começar.\n\n"
             "⏱️ Monitorização 24h/24\n"
             "🔔 Alerta instantâneo à mínima alteração de preço\n"
-            "📊 Histórico fiável de cada variação, para identificar as promoções reais\n\n"
-            "<i>Links de afiliado da Amazon — sem impacto no teu preço.</i>"
+            "📊 Histórico fiável de cada variação, para identificar as promoções reais"
         ),
         "menu_track": "🔍 Seguir um produto",
         "menu_list": "📋 Os meus produtos",
@@ -338,8 +333,7 @@ TRANSLATIONS = {
             "начать.\n\n"
             "⏱️ Отслеживание 24/7\n"
             "🔔 Мгновенное уведомление при малейшем изменении цены\n"
-            "📊 Надёжная история каждого изменения, чтобы находить настоящие скидки\n\n"
-            "<i>Партнёрские ссылки Amazon — без влияния на цену для вас.</i>"
+            "📊 Надёжная история каждого изменения, чтобы находить настоящие скидки"
         ),
         "menu_track": "🔍 Отслеживать товар",
         "menu_list": "📋 Мои товары",
